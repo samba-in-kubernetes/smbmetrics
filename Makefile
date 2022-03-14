@@ -87,6 +87,20 @@ vet: reformat
 yaml-fmt: yq
 	$(call yamls_reformat, $(CURDIR))
 
+# Build the container image
+.PHONY: image-build
+image-build: Dockerfile
+	$(CONTAINER_CMD) build \
+		--build-arg=GIT_VERSION="$(GIT_VERSION)" \
+		--build-arg=COMMIT_ID="$(COMMIT_ID)" \
+		--build-arg=ARCH="$(GOARCH)" \
+		$(CONTAINER_BUILD_OPTS) -f $< -t $(IMG)
+
+# Push the container image
+.PHONY: image-push
+image-push:
+	$(CONTAINER_CMD) push $(IMG)
+
 # Check the code
 .PHONY: check check-golangci-lint check-format check-yaml
 
