@@ -1,9 +1,5 @@
-
-# Test binary, build with `go test -c`
+# test binary, build with `go test -c`
 *.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
 
 # editor and IDE paraphernalia
 *.swp
@@ -19,3 +15,9 @@ devel.mk
 
 # local GOBIN for build tools
 /.bin
+
+# output bin directory
+/bin
+
+# external vendor sources
+/vendor
