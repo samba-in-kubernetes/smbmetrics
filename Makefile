@@ -58,6 +58,45 @@ define yamls_reformat
 	YQ=$(YQ) $(CURDIR)/hack/yq-fixup-yamls.sh $(1)
 endef
 
+all: build
+
+# Build executable
+.PHONY: build
+build:
+	CGO_ENABLED=0 $(GO_CMD) build -o bin/smbmetrics \
+		-ldflags $(GOLDFLAGS) cmd/main.go
+
+# Run unit tests
+.PHONY: test
+test: build vet
+	$(GO_CMD) test ./... -coverprofile cover.out
+
+
+# Run go fmt to reformat code
+.PHONY: reformat
+reformat:
+	$(GO_CMD) fmt ./...
+
+# Run go vet against code
+.PHONY: vet
+vet: reformat
+	$(GO_CMD) vet ./...
+
+# Format yaml files for yamllint standard
+.PHONY: yaml-fmt
+yaml-fmt: yq
+	$(call yamls_reformat, $(CURDIR))
+
+# Check the code
+.PHONY: check check-golangci-lint check-format check-yaml
+
+check: check-golangci-lint vet check-yaml
+
+check-golangci-lint: golangci-lint
+	$(GOLANGCI_LINT) -c .golangci.yaml run ./...
+
+check-yaml:
+	$(YAMLLINT_CMD) -c ./.yamllint.yaml ./
 
 # Find or download auxiliary build tools
 .PHONY: build-tools golangci-lint yq
