@@ -21,6 +21,15 @@ var (
 
 `
 
+	outputSmbStatusS2 = `
+
+Service      pid     Machine       Connected at                     Encryption Signing
+---------------------------------------------------------------------------------------------
+samba-share  295     ::1           Thu Apr  7 14:33:19 2022 UTC     -          -
+IPC$         295     ::1           Thu Apr  7 14:33:19 2022 UTC     -          -
+
+`
+
 	outputSmbStatusp = `
 
 Samba version 4.14.12
@@ -44,15 +53,23 @@ Pid          User(ID)   DenyMode   Access      R/W        Oplock           Share
 //revive:enable line-length-limit
 
 func TestParseSmbStatusShares(t *testing.T) {
-	locks, err := parseSmbStatusShares(outputSmbStatusS)
+	shares, err := parseSmbStatusShares(outputSmbStatusS)
 	assert.NoError(t, err)
-	assert.Equal(t, len(locks), 2)
-	lock1 := locks[0]
-	assert.Equal(t, lock1.Service, "share_test")
-	assert.Equal(t, lock1.PID, int64(13668))
-	assert.Equal(t, lock1.Machine, "10.66.208.149")
-	assert.Equal(t, lock1.Encryption, "-")
-	assert.Equal(t, lock1.Signing, "-")
+	assert.Equal(t, len(shares), 2)
+	share1 := shares[0]
+	assert.Equal(t, share1.Service, "share_test")
+	assert.Equal(t, share1.PID, int64(13668))
+	assert.Equal(t, share1.Machine, "10.66.208.149")
+	assert.Equal(t, share1.Encryption, "-")
+	assert.Equal(t, share1.Signing, "-")
+
+	shares, err = parseSmbStatusShares(outputSmbStatusS2)
+	assert.NoError(t, err)
+	assert.Equal(t, len(shares), 1)
+	share1 = shares[0]
+	assert.Equal(t, share1.Service, "samba-share")
+	assert.Equal(t, share1.PID, int64(295))
+	assert.Equal(t, share1.Machine, "::1")
 }
 
 func TestParseSmbStatusProcs(t *testing.T) {
