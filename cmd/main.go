@@ -18,13 +18,20 @@ var (
 	CommitID = "(unset)"
 )
 
+func init() {
+	metrics.UpdateDefaultVersions(Version, CommitID)
+}
+
 func main() {
 	log := zap.New(zap.UseDevMode(true))
 	log.Info("Initializing smbmetrics",
 		"ProgramName", os.Args[0],
-		"Version", Version,
-		"CommitID", CommitID,
 		"GoVersion", goruntime.Version())
+
+	vers, _ := metrics.ResolveVersions(nil)
+	log.Info("Versions", "Versions", vers)
+
+	log.Info("Self", "PodID", metrics.GetSelfPodID())
 
 	loc, err := metrics.LocateSmbStatus()
 	if err != nil {
