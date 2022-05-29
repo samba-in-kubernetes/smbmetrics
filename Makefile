@@ -5,8 +5,8 @@
 VERSION?=0.0.1
 
 # Commit info
-COMMIT_ID=$(shell git describe --abbrev=40 --always --dirty=+ 2>/dev/null)
-GIT_VERSION=$(shell git describe --match='v[0-9]*.[0-9].[0-9]' 2>/dev/null || echo "(unset)")
+COMMIT_ID=$(shell git describe --abbrev=40 --always --exclude='*' --dirty=+ 2>/dev/null)
+GIT_VERSION=$(shell git describe --match='v[0-9]*.[0-9]' --match='v[0-9]*.[0-9].[0-9]' 2>/dev/null || echo "(unset)")
 
 GO_CMD:=go
 GOFMT_CMD:=gofmt
