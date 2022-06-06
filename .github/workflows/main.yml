@@ -1,0 +1,86 @@
+name: CI
+# Run tests on pull requests and after "merges"
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  # Do a build/compile smoke test
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ">=1.17.0"
+      - uses: actions/checkout@v2
+      - name: Build
+        run: make
+  # Run static/code-quality checks
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: ">=1.17.0"
+      - uses: actions/checkout@v2
+      - name: Install build tools
+        run: make build-tools
+      - name: Run checks
+        run: make check
+  podmanbuild:
+    runs-on: ubuntu-latest
+    # don't run on push, since the "push" job contains the
+    # image build step, so no need to do it twice.
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install fuse-overlayfs
+        run: sudo apt-get -y install fuse-overlayfs
+      - name: Setup podman config
+        run: |
+          mkdir -p /home/runner/.config/containers/
+          cat >/home/runner/.config/containers/storage.conf <<EOF
+          [storage]
+          driver = "overlay"
+          graphroot = "${HOME}/.local/share/containers/storage2"
+
+            [storage.options]
+              mount_program = "/usr/bin/fuse-overlayfs"
+          EOF
+          cat >/home/runner/.config/containers/containers.conf <<EOF
+          [containers]
+          netns = "host"
+          EOF
+      - name: build container image
+        # note: forcing use of podman here since we are
+        # using podman explicitly for the push job
+        run: make CONTAINER_CMD=podman image-build
+  dockerbuild:
+    runs-on: ubuntu-latest
+    # don't run on push, since the "push" job contains the
+    # image build step, so no need to do it twice.
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v2
+      - name: build container image
+        # note: forcing use of podman here since we are
+        # using podman explicitly for the push job
+        run: make CONTAINER_CMD=docker image-build
+  # push the container to quay.io - only for pushes, not PRs
+  push:
+    needs: [build, check]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v2
+      - name: log in to quay.io
+        # using docker for now, since podman has an issue with space
+        # consumption: image build fails with no space left on device...
+        run: echo "${{ secrets.QUAY_PASS }}" | docker login -u "${{ secrets.QUAY_USER }}" --password-stdin quay.io
+      - name: build container image
+        # note: forcing use of docker here, since we did docker login above
+        run: make CONTAINER_CMD=docker image-build
+      - name: push container image
+        # note: forcing use of docker here, since we did docker login above
+        run: make CONTAINER_CMD=docker container-push
