@@ -94,7 +94,7 @@ image-build: Dockerfile
 		--build-arg=GIT_VERSION="$(GIT_VERSION)" \
 		--build-arg=COMMIT_ID="$(COMMIT_ID)" \
 		--build-arg=ARCH="$(GOARCH)" \
-		$(CONTAINER_BUILD_OPTS) -f $< -t $(IMG)
+		$(CONTAINER_BUILD_OPTS) -f $< -t $(IMG) .
 
 # Push the container image
 .PHONY: image-push
