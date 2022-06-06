@@ -83,4 +83,4 @@ jobs:
         run: make CONTAINER_CMD=docker image-build
       - name: push container image
         # note: forcing use of docker here, since we did docker login above
-        run: make CONTAINER_CMD=docker container-push
+        run: make CONTAINER_CMD=docker image-push
