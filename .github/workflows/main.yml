@@ -2,7 +2,7 @@ name: CI
 # Run tests on pull requests and after "merges"
 on:
   push:
-    branches: [main]
+    branches: ['*']
   pull_request:
     branches: [main]
 jobs:
