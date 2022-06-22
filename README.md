@@ -9,5 +9,5 @@ Samba metrics exporter converts 'smbstatus' output into
 ```bash
 $ make build
 
-$ make image
+$ make image-build
 ```
