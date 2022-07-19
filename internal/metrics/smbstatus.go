@@ -3,28 +3,87 @@
 package metrics
 
 import (
+	"encoding/json"
 	"errors"
 	"os"
 	"os/exec"
-	"strconv"
 	"strings"
 	"time"
 )
 
+// SmbStatusServerID represents a server_id output field
+type SmbStatusServerID struct {
+	PID      string `json:"pid"`
+	TaskID   string `json:"task_id"`
+	VNN      string `json:"vnn"`
+	UniqueID string `json:"unique_id"`
+}
+
+// SmbStatusEncryption represents a encryption output field
+type SmbStatusEncryption struct {
+	Cipher string `json:"cipher"`
+	Degree string `json:"degree"`
+}
+
+// SmbStatusSigning represents a signing output field
+type SmbStatusSigning struct {
+	Cipher string `json:"cipher"`
+	Degree string `json:"degree"`
+}
+
 // SmbStatusShare represents a single entry from the output of 'smbstatus -S'
 type SmbStatusShare struct {
-	Service       string
-	PID           int64
-	Machine       string
-	ConnectedAt   string
-	ConnectedTime time.Time
-	Encryption    string
-	Signing       string
+	Service     string              `json:"service"`
+	ServerID    SmbStatusServerID   `json:"server_id"`
+	Machine     string              `json:"machine"`
+	ConnectedAt string              `json:"connected_at"`
+	Encryption  SmbStatusEncryption `json:"encryption"`
+	Signing     SmbStatusSigning    `json:"signing"`
+}
+
+// SmbStatusSession represents a session output field
+type SmbStatusSession struct {
+	SessionID      string              `json:"session_id"`
+	ServerID       SmbStatusServerID   `json:"server_id"`
+	UID            int                 `json:"uid"`
+	GID            int                 `json:"gid"`
+	Username       string              `json:"username"`
+	Groupname      string              `json:"groupname"`
+	RemoteMachine  string              `json:"remote_machine"`
+	Hostname       string              `json:"hostname"`
+	SessionDialect string              `json:"session_dialect"`
+	Encryption     SmbStatusEncryption `json:"encryption"`
+	Signing        SmbStatusSigning    `json:"signing"`
+}
+
+// SmbStatusFileID represents a fileid output field
+type SmbStatusFileID struct {
+	DevID int64 `json:"devid"`
+	Inode int64 `json:"inode"`
+	Extid int32 `json:"extid"`
+}
+
+// SmbStatusLockedFile represents a locked-file output field
+type SmbStatusLockedFile struct {
+	ServicePath       string          `json:"service_path"`
+	Filename          string          `json:"filename"`
+	FileID            SmbStatusFileID `json:"fileid"`
+	NumPendingDeletes int             `json:"num_pending_deletes"`
+}
+
+// SmbStatusJSON represents output of 'smbstatus --json'
+type SmbStatusJSON struct {
+	Timestamp   string                         `json:"timestamp"`
+	Version     string                         `json:"version"`
+	SmbConf     string                         `json:"smb_conf"`
+	Sessions    map[string]SmbStatusSession    `json:"sessions"`
+	TCons       map[string]SmbStatusShare      `json:"tcons"`
+	LockedFiles map[string]SmbStatusLockedFile `json:"locked_files"`
 }
 
 // SmbStatusProc represents a single entry from the output of 'smbstatus -p'
 type SmbStatusProc struct {
-	PID             int64
+	PID             string
 	Username        string
 	Group           string
 	Machine         string
@@ -35,8 +94,8 @@ type SmbStatusProc struct {
 
 // SmbStatusLock represents a single entry from the output of 'smbstatus -L'
 type SmbStatusLock struct {
-	PID       int64
-	UserID    int64
+	PID       string
+	UserID    string
 	DenyMode  string
 	Access    string
 	RW        string
@@ -78,11 +137,29 @@ func RunSmbStatusVersion() (string, error) {
 
 // RunSmbStatusShares executes 'smbstatus -S' on host container
 func RunSmbStatusShares() ([]SmbStatusShare, error) {
-	dat, err := executeSmbStatusCommand("-S")
-	if err != nil {
-		return []SmbStatusShare{}, err
+	// Case 1: using new json output
+	dat, err := executeSmbStatusCommand("-S --json")
+	if err == nil {
+		return parseSmbStatusSharesAsJSON(dat)
 	}
-	return parseSmbStatusShares(dat)
+	// Case 2: fallback to raw-text output
+	dat, err = executeSmbStatusCommand("-S")
+	if err == nil {
+		return parseSmbStatusShares(dat)
+	}
+	return []SmbStatusShare{}, err
+}
+
+func parseSmbStatusSharesAsJSON(dat string) ([]SmbStatusShare, error) {
+	shares := []SmbStatusShare{}
+	res, err := parseSmbStatusJSON(dat)
+	if err != nil {
+		return shares, err
+	}
+	for _, share := range res.TCons {
+		shares = append(shares, share)
+	}
+	return shares, nil
 }
 
 // RunSmbStatusLocks executes 'smbstatus -L' on host container
@@ -106,15 +183,19 @@ func RunSmbStatusProcs() ([]SmbStatusProc, error) {
 // SmbStatusSharesByMachine converts the output of RunSmbStatusShares into map
 // indexed by machine's host
 func SmbStatusSharesByMachine() (map[string][]SmbStatusShare, error) {
-	ret := map[string][]SmbStatusShare{}
 	shares, err := RunSmbStatusShares()
 	if err != nil {
-		return ret, err
+		return map[string][]SmbStatusShare{}, err
 	}
+	return makeSmbSharesMap(shares), nil
+}
+
+func makeSmbSharesMap(shares []SmbStatusShare) map[string][]SmbStatusShare {
+	ret := map[string][]SmbStatusShare{}
 	for _, share := range shares {
 		ret[share.Machine] = append(ret[share.Machine], share)
 	}
-	return ret, nil
+	return ret
 }
 
 func executeSmbStatusCommand(args ...string) (string, error) {
@@ -175,18 +256,11 @@ func parseSmbStatusShares(data string) ([]SmbStatusShare, error) {
 		// Parse data into internal repr
 		share := SmbStatusShare{}
 		share.Service = parseSubstr(ln, serviceIndex)
-		pid, err := parseInt64(ln, pidIndex)
-		if err != nil {
-			return shares, err
-		}
-		share.PID = pid
+		share.ServerID.PID = parseSubstr(ln, pidIndex)
 		share.Machine = parseSubstr(ln, machineIndex)
 		share.ConnectedAt = parseSubstr2(ln, connectedAtIndex, encryptionIndex)
-		share.Encryption = parseSubstr(ln, encryptionIndex)
-		share.Signing = parseSubstr(ln, signingIndex)
-		if t, err := parseTime(share.ConnectedAt); err == nil {
-			share.ConnectedTime = t
-		}
+		share.Encryption.Cipher = parseSubstr(ln, encryptionIndex)
+		share.Signing.Cipher = parseSubstr(ln, signingIndex)
 
 		// Ignore "IPC$"
 		if share.Service == "IPC$" {
@@ -239,11 +313,7 @@ func parseSmbStatusProcs(data string) ([]SmbStatusProc, error) {
 		}
 		// Parse data into internal repr
 		proc := SmbStatusProc{}
-		pid, err := parseInt64(ln, pidIndex)
-		if err != nil {
-			return procs, err
-		}
-		proc.PID = pid
+		proc.PID = parseSubstr(ln, pidIndex)
 		proc.Username = parseSubstr(ln, usernameIndex)
 		proc.Group = parseSubstr(ln, groupIndex)
 		proc.Machine = parseSubstr(ln, machineIndex)
@@ -300,16 +370,8 @@ func parseSmbStatusLocks(data string) ([]SmbStatusLock, error) {
 		}
 		// Parse data into internal repr
 		lock := SmbStatusLock{}
-		pid, err := parseInt64(ln, pidIndex)
-		if err != nil {
-			return locks, err
-		}
-		lock.PID = pid
-		user, err := parseInt64(ln, userIndex)
-		if err != nil {
-			return locks, err
-		}
-		lock.UserID = user
+		lock.PID = parseSubstr(ln, pidIndex)
+		lock.UserID = parseSubstr(ln, userIndex)
 		lock.DenyMode = parseSubstr(ln, denyModeIndex)
 		lock.Access = parseSubstr(ln, accessIndex)
 		lock.RW = parseSubstr(ln, rwIndex)
@@ -318,10 +380,6 @@ func parseSmbStatusLocks(data string) ([]SmbStatusLock, error) {
 		locks = append(locks, lock)
 	}
 	return locks, nil
-}
-
-func parseInt64(s string, startIndex int) (int64, error) {
-	return strconv.ParseInt(parseSubstr(s, startIndex), 10, 64)
 }
 
 func parseSubstr(s string, startIndex int) string {
@@ -337,7 +395,7 @@ func parseSubstr2(s string, startIndex, endIndex int) string {
 	return strings.TrimSpace(s[startIndex:endIndex])
 }
 
-func parseTime(s string) (time.Time, error) {
+func ParseTime(s string) (time.Time, error) {
 	layouts := []string{
 		time.ANSIC,
 		time.UnixDate,
@@ -350,4 +408,12 @@ func parseTime(s string) (time.Time, error) {
 	}
 	// samba's lib/util/time.c uses non standad layout...
 	return time.Time{}, errors.New("unknow time format " + s)
+}
+
+// parseSmbStatusJSON parses to output of 'smbstatus --json' into internal
+// representation.
+func parseSmbStatusJSON(data string) (*SmbStatusJSON, error) {
+	res := SmbStatusJSON{}
+	err := json.Unmarshal([]byte(data), &res)
+	return &res, err
 }
