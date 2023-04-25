@@ -28,6 +28,18 @@ jobs:
         run: make build-tools
       - name: Run checks
         run: make check
+  check-commits:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Ensure branches
+        run: git fetch
+      - name: Lint git commit messages
+        run: make check-gitlint
   podmanbuild:
     runs-on: ubuntu-latest
     # don't run on push, since the "push" job contains the
