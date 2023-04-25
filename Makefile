@@ -102,7 +102,7 @@ image-push:
 	$(CONTAINER_CMD) push $(IMG)
 
 # Check the code
-.PHONY: check check-golangci-lint check-format check-yaml
+.PHONY: check check-golangci-lint check-format check-yaml check-gitlint
 
 check: check-golangci-lint vet check-yaml
 
@@ -111,6 +111,9 @@ check-golangci-lint: golangci-lint
 
 check-yaml:
 	$(YAMLLINT_CMD) -c ./.yamllint.yaml ./
+
+check-gitlint: gitlint
+	$(GITLINT) -C .gitlint --commits origin/main.. lint
 
 # Find or download auxiliary build tools
 .PHONY: build-tools golangci-lint yq
@@ -135,4 +138,14 @@ ifeq (, $(shell command -v $(YQ) ;))
 	@echo "yq installed in $(YQ)"
 endif
 
-
+gitlint:
+ifeq (, $(shell command -v gitlint ;))
+	@echo "gitlint not found in PATH, checking $(GOBIN_ALT)"
+ifeq (, $(shell command -v $(GOBIN_ALT)/gitlint ;))
+	@$(call installtool, --gitlint)
+	@echo "gitlint installed in $(GOBIN_ALT)"
+endif
+GITLINT=$(GOBIN_ALT)/gitlint
+else
+GITLINT=$(shell command -v gitlint ;)
+endif
