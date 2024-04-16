@@ -5,7 +5,7 @@ linters:
   disable-all: true
   enable:
     - asciicheck
-    - deadcode
+    # - deadcode
     - depguard
     - dupl
     - errcheck
@@ -30,16 +30,24 @@ linters:
     # - nolintlint
     - revive
     - staticcheck
-    - structcheck
+    # - structcheck
     # - tagliatelle
     # - testpackage
     - typecheck
     - unconvert
     # - unparam
     - unused
-    - varcheck
+    # - varcheck
     - whitespace
 linters-settings:
+  depguard:
+    rules:
+      main:
+        list-mode: lax
+        # using explicit 'deny' entry only to suppress linter warnings.
+        deny:
+          - pkg: "github.com/sirupsen/logrus"
+            desc: not allowed
   funlen:
     lines: 188
     statements: 60
