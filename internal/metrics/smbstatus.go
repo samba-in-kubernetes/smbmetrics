@@ -105,6 +105,14 @@ type SmbStatusLock struct {
 	Time      string
 }
 
+// SmbStatusJSON represents output of 'smbstatus -L --json'
+type SmbStatusLocksJSON struct {
+	Timestamp string                         `json:"timestamp"`
+	Version   string                         `json:"version"`
+	SmbConf   string                         `json:"smb_conf"`
+	OpenFiles map[string]SmbStatusLockedFile `json:"open_files"`
+}
+
 // LocateSmbStatus finds the local executable of 'smbstatus' on host container.
 func LocateSmbStatus() (string, error) {
 	knowns := []string{
@@ -169,6 +177,27 @@ func RunSmbStatusLocks() ([]SmbStatusLock, error) {
 		return []SmbStatusLock{}, err
 	}
 	return parseSmbStatusLocks(dat)
+}
+
+// RunSmbStatusLocks executes 'smbstatus -L --json' on host container
+func RunSmbStatusLockedFiles() ([]SmbStatusLockedFile, error) {
+	dat, err := executeSmbStatusCommand("-L --json")
+	if err != nil {
+		return []SmbStatusLockedFile{}, err
+	}
+	return parseSmbStatusLocksAsJSON(dat)
+}
+
+func parseSmbStatusLocksAsJSON(dat string) ([]SmbStatusLockedFile, error) {
+	lockedFiles := []SmbStatusLockedFile{}
+	res, err := parseSmbStatusLocksJSON(dat)
+	if err != nil {
+		return lockedFiles, err
+	}
+	for _, lfile := range res.OpenFiles {
+		lockedFiles = append(lockedFiles, lfile)
+	}
+	return lockedFiles, nil
 }
 
 // RunSmbStatusProcs executes 'smbstatus -p' on host container
@@ -414,6 +443,14 @@ func ParseTime(s string) (time.Time, error) {
 // representation.
 func parseSmbStatusJSON(data string) (*SmbStatusJSON, error) {
 	res := SmbStatusJSON{}
+	err := json.Unmarshal([]byte(data), &res)
+	return &res, err
+}
+
+// parseSmbStatusJSON parses to output of 'smbstatus -L --json' into internal
+// representation.
+func parseSmbStatusLocksJSON(data string) (*SmbStatusLocksJSON, error) {
+	res := SmbStatusLocksJSON{}
 	err := json.Unmarshal([]byte(data), &res)
 	return &res, err
 }
