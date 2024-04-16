@@ -451,6 +451,142 @@ Pid          User(ID)   DenyMode   Access      R/W        Oplock           Share
 	}
   }
   `
+
+	outputSmbStatusLocksJSON = `
+  {
+	"timestamp": "2024-04-14T14:53:34.901974+0300",
+	"version": "4.21.0pre1-GIT-58a018fb7ad",
+	"smb_conf": "//etc/samba/smb.conf",
+	"open_files": {
+	  "/A/A2/A6/r1": {
+	    "service_path": "/",
+	    "filename": "A/A2/A6/r1",
+	    "fileid": {
+	      "devid": 1,
+	      "inode": 61,
+	      "extid": 0
+	    },
+	    "num_pending_deletes": 0,
+	    "opens": {
+	      "1790/261": {
+		"server_id": {
+		  "pid": "1790",
+		  "task_id": "0",
+		  "vnn": "4294967295",
+		  "unique_id": "3607086338167075363"
+		},
+		"uid": 2222,
+		"share_file_id": "261",
+		"sharemode": {
+		  "hex": "0x00000007",
+		  "READ": true,
+		  "WRITE": true,
+		  "DELETE": true,
+		  "text": "RWD"
+		},
+		"access_mask": {
+		  "hex": "0x00120089",
+		  "READ_DATA": true,
+		  "WRITE_DATA": false,
+		  "APPEND_DATA": false,
+		  "READ_EA": true,
+		  "WRITE_EA": false,
+		  "EXECUTE": false,
+		  "READ_ATTRIBUTES": true,
+		  "WRITE_ATTRIBUTES": false,
+		  "DELETE_CHILD": false,
+		  "DELETE": false,
+		  "READ_CONTROL": true,
+		  "WRITE_DAC": false,
+		  "SYNCHRONIZE": true,
+		  "ACCESS_SYSTEM_SECURITY": false,
+		  "text": "R"
+		},
+		"caching": {
+		  "READ": true,
+		  "WRITE": true,
+		  "HANDLE": false,
+		  "hex": "0x00000005",
+		  "text": "RW"
+		},
+		"oplock": {
+		  "EXCLUSIVE": true,
+		  "BATCH": true,
+		  "LEVEL_II": false,
+		  "LEASE": false,
+		  "text": "BATCH"
+		},
+		"lease": {},
+		"opened_at": "2024-04-14T14:53:15.569085+03:00"
+	      }
+	    }
+	  },
+	  "/A/A1/r2": {
+	    "service_path": "/",
+	    "filename": "A/A1/r2",
+	    "fileid": {
+	      "devid": 2,
+	      "inode": 52,
+	      "extid": 0
+	    },
+	    "num_pending_deletes": 2,
+	    "opens": {
+	      "1790/267": {
+		"server_id": {
+		  "pid": "1790",
+		  "task_id": "0",
+		  "vnn": "4294967295",
+		  "unique_id": "3607086338167075363"
+		},
+		"uid": 1111,
+		"share_file_id": "222",
+		"sharemode": {
+		  "hex": "0x00000007",
+		  "READ": true,
+		  "WRITE": true,
+		  "DELETE": true,
+		  "text": "RWD"
+		},
+		"access_mask": {
+		  "hex": "0x00120089",
+		  "READ_DATA": true,
+		  "WRITE_DATA": false,
+		  "APPEND_DATA": false,
+		  "READ_EA": true,
+		  "WRITE_EA": false,
+		  "EXECUTE": false,
+		  "READ_ATTRIBUTES": true,
+		  "WRITE_ATTRIBUTES": false,
+		  "DELETE_CHILD": false,
+		  "DELETE": false,
+		  "READ_CONTROL": true,
+		  "WRITE_DAC": false,
+		  "SYNCHRONIZE": true,
+		  "ACCESS_SYSTEM_SECURITY": false,
+		  "text": "R"
+		},
+		"caching": {
+		  "READ": true,
+		  "WRITE": true,
+		  "HANDLE": false,
+		  "hex": "0x00000005",
+		  "text": "RW"
+		},
+		"oplock": {
+		  "EXCLUSIVE": true,
+		  "BATCH": true,
+		  "LEVEL_II": false,
+		  "LEASE": false,
+		  "text": "BATCH"
+		},
+		"lease": {},
+		"opened_at": "2024-04-14T14:53:32.258325+03:00"
+	      }
+	    }
+	  }
+	}
+      }
+  `
 )
 
 //revive:enable line-length-limit
@@ -538,4 +674,16 @@ func TestParseSmbStatusLocks(t *testing.T) {
 	assert.Equal(t, lock1.UserID, "1001")
 	assert.Equal(t, lock1.DenyMode, "DENY_NONE")
 	assert.Equal(t, lock1.RW, "RDONLY")
+}
+
+func TestParseSmbStatusLocksJSON(t *testing.T) {
+	locks, err := parseSmbStatusLocksAsJSON(outputSmbStatusLocksJSON)
+	assert.NoError(t, err)
+	assert.Equal(t, len(locks), 2)
+	lock1 := locks[0]
+	assert.Equal(t, lock1.FileID.Inode, int64(61))
+	assert.Equal(t, lock1.NumPendingDeletes, 0)
+	lock2 := locks[1]
+	assert.Equal(t, lock2.FileID.Inode, int64(52))
+	assert.Equal(t, lock2.NumPendingDeletes, 2)
 }
