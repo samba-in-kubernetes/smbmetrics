@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 // SmbStatusServerID represents a server_id output field
@@ -77,8 +76,8 @@ type SmbStatusLockedFile struct {
 	NumPendingDeletes int             `json:"num_pending_deletes"`
 }
 
-// SmbStatusJSON represents output of 'smbstatus --json'
-type SmbStatusJSON struct {
+// SmbStatus represents output of 'smbstatus --json'
+type SmbStatus struct {
 	Timestamp   string                         `json:"timestamp"`
 	Version     string                         `json:"version"`
 	SmbConf     string                         `json:"smb_conf"`
@@ -87,39 +86,15 @@ type SmbStatusJSON struct {
 	LockedFiles map[string]SmbStatusLockedFile `json:"locked_files"`
 }
 
-// SmbStatusProc represents a single entry from the output of 'smbstatus -p'
-type SmbStatusProc struct {
-	PID             string
-	Username        string
-	Group           string
-	Machine         string
-	ProtocolVersion string
-	Encryption      string
-	Signing         string
-}
-
-// SmbStatusLock represents a single entry from the output of 'smbstatus -L'
-type SmbStatusLock struct {
-	PID       string
-	UserID    string
-	DenyMode  string
-	Access    string
-	RW        string
-	Oplock    string
-	SharePath string
-	Name      string
-	Time      string
-}
-
-// SmbStatusJSON represents output of 'smbstatus -L --json'
-type SmbStatusLocksJSON struct {
+// SmbStatusLocks represents output of 'smbstatus -L --json'
+type SmbStatusLocks struct {
 	Timestamp string                         `json:"timestamp"`
 	Version   string                         `json:"version"`
 	SmbConf   string                         `json:"smb_conf"`
 	OpenFiles map[string]SmbStatusLockedFile `json:"open_files"`
 }
 
-// LocateSmbStatus finds the local executable of 'smbstatus' on host container.
+// LocateSmbStatus finds the local executable of 'smbstatus' on host.
 func LocateSmbStatus() (string, error) {
 	knowns := []string{
 		"/usr/bin/smbstatus",
@@ -149,18 +124,18 @@ func RunSmbStatusVersion() (string, error) {
 	return ver, nil
 }
 
-// RunSmbStatusShares executes 'smbstatus -S --json' on host container
+// RunSmbStatusShares executes 'smbstatus --shares --json' on host
 func RunSmbStatusShares() ([]SmbStatusTreeCon, error) {
-	dat, err := executeSmbStatusCommand("-S --json")
+	dat, err := executeSmbStatusCommand("--shares --json")
 	if err != nil {
 		return []SmbStatusTreeCon{}, err
 	}
-	return parseSmbStatusSharesAsJSON(dat)
+	return parseSmbStatusTreeCons(dat)
 }
 
-func parseSmbStatusSharesAsJSON(dat string) ([]SmbStatusTreeCon, error) {
+func parseSmbStatusTreeCons(dat string) ([]SmbStatusTreeCon, error) {
 	tcons := []SmbStatusTreeCon{}
-	res, err := parseSmbStatusJSON(dat)
+	res, err := parseSmbStatus(dat)
 	if err != nil {
 		return tcons, err
 	}
@@ -170,18 +145,18 @@ func parseSmbStatusSharesAsJSON(dat string) ([]SmbStatusTreeCon, error) {
 	return tcons, nil
 }
 
-// RunSmbStatusLocks executes 'smbstatus -L --json' on host container
-func RunSmbStatusLockedFiles() ([]SmbStatusLockedFile, error) {
-	dat, err := executeSmbStatusCommand("-L --json")
+// RunSmbStatusLocks executes 'smbstatus --locks --json' on host
+func RunSmbStatusLocks() ([]SmbStatusLockedFile, error) {
+	dat, err := executeSmbStatusCommand("--locks --json")
 	if err != nil {
 		return []SmbStatusLockedFile{}, err
 	}
-	return parseSmbStatusLocksAsJSON(dat)
+	return parseSmbStatusLockedFiles(dat)
 }
 
-func parseSmbStatusLocksAsJSON(dat string) ([]SmbStatusLockedFile, error) {
+func parseSmbStatusLockedFiles(dat string) ([]SmbStatusLockedFile, error) {
 	lockedFiles := []SmbStatusLockedFile{}
-	res, err := parseSmbStatusLocksJSON(dat)
+	res, err := parseSmbStatusLocks(dat)
 	if err != nil {
 		return lockedFiles, err
 	}
@@ -194,16 +169,16 @@ func parseSmbStatusLocksAsJSON(dat string) ([]SmbStatusLockedFile, error) {
 // SmbStatusSharesByMachine converts the output of RunSmbStatusShares into map
 // indexed by machine's host
 func SmbStatusSharesByMachine() (map[string][]SmbStatusTreeCon, error) {
-	shares, err := RunSmbStatusShares()
+	tcons, err := RunSmbStatusShares()
 	if err != nil {
 		return map[string][]SmbStatusTreeCon{}, err
 	}
-	return makeSmbSharesMap(shares), nil
+	return makeSmbSharesMap(tcons), nil
 }
 
-func makeSmbSharesMap(shares []SmbStatusTreeCon) map[string][]SmbStatusTreeCon {
+func makeSmbSharesMap(tcons []SmbStatusTreeCon) map[string][]SmbStatusTreeCon {
 	ret := map[string][]SmbStatusTreeCon{}
-	for _, share := range shares {
+	for _, share := range tcons {
 		ret[share.Machine] = append(ret[share.Machine], share)
 	}
 	return ret
@@ -227,33 +202,18 @@ func executeCommand(command string, arg ...string) (string, error) {
 	return res, nil
 }
 
-func ParseTime(s string) (time.Time, error) {
-	layouts := []string{
-		time.ANSIC,
-		time.UnixDate,
-		time.RFC3339,
-	}
-	for _, layout := range layouts {
-		if t, err := time.Parse(layout, s); err == nil {
-			return t, nil
-		}
-	}
-	// samba's lib/util/time.c uses non standad layout...
-	return time.Time{}, errors.New("unknow time format " + s)
-}
-
-// parseSmbStatusJSON parses to output of 'smbstatus --json' into internal
+// parseSmbStatus parses to output of 'smbstatus --json' into internal
 // representation.
-func parseSmbStatusJSON(data string) (*SmbStatusJSON, error) {
-	res := SmbStatusJSON{}
+func parseSmbStatus(data string) (*SmbStatus, error) {
+	res := SmbStatus{}
 	err := json.Unmarshal([]byte(data), &res)
 	return &res, err
 }
 
-// parseSmbStatusJSON parses to output of 'smbstatus -L --json' into internal
-// representation.
-func parseSmbStatusLocksJSON(data string) (*SmbStatusLocksJSON, error) {
-	res := SmbStatusLocksJSON{}
+// parseSmbStatusLocks parses to output of 'smbstatus --locks --json' into
+// internal representation.
+func parseSmbStatusLocks(data string) (*SmbStatusLocks, error) {
+	res := SmbStatusLocks{}
 	err := json.Unmarshal([]byte(data), &res)
 	return &res, err
 }
