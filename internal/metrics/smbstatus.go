@@ -31,10 +31,12 @@ type SmbStatusSigning struct {
 	Degree string `json:"degree"`
 }
 
-// SmbStatusShare represents a single entry from the output of 'smbstatus -S'
-type SmbStatusShare struct {
+// SmbStatusTreeCon represents a 'tcon' output field
+type SmbStatusTreeCon struct {
 	Service     string              `json:"service"`
 	ServerID    SmbStatusServerID   `json:"server_id"`
+	TConID      string              `json:"tcon_id"`
+	SessionID   string              `json:"session_id"`
 	Machine     string              `json:"machine"`
 	ConnectedAt string              `json:"connected_at"`
 	Encryption  SmbStatusEncryption `json:"encryption"`
@@ -81,7 +83,7 @@ type SmbStatusJSON struct {
 	Version     string                         `json:"version"`
 	SmbConf     string                         `json:"smb_conf"`
 	Sessions    map[string]SmbStatusSession    `json:"sessions"`
-	TCons       map[string]SmbStatusShare      `json:"tcons"`
+	TCons       map[string]SmbStatusTreeCon    `json:"tcons"`
 	LockedFiles map[string]SmbStatusLockedFile `json:"locked_files"`
 }
 
@@ -148,7 +150,7 @@ func RunSmbStatusVersion() (string, error) {
 }
 
 // RunSmbStatusShares executes 'smbstatus -S' on host container
-func RunSmbStatusShares() ([]SmbStatusShare, error) {
+func RunSmbStatusShares() ([]SmbStatusTreeCon, error) {
 	// Case 1: using new json output
 	dat, err := executeSmbStatusCommand("-S --json")
 	if err == nil {
@@ -159,19 +161,19 @@ func RunSmbStatusShares() ([]SmbStatusShare, error) {
 	if err == nil {
 		return parseSmbStatusShares(dat)
 	}
-	return []SmbStatusShare{}, err
+	return []SmbStatusTreeCon{}, err
 }
 
-func parseSmbStatusSharesAsJSON(dat string) ([]SmbStatusShare, error) {
-	shares := []SmbStatusShare{}
+func parseSmbStatusSharesAsJSON(dat string) ([]SmbStatusTreeCon, error) {
+	tcons := []SmbStatusTreeCon{}
 	res, err := parseSmbStatusJSON(dat)
 	if err != nil {
-		return shares, err
+		return tcons, err
 	}
 	for _, share := range res.TCons {
-		shares = append(shares, share)
+		tcons = append(tcons, share)
 	}
-	return shares, nil
+	return tcons, nil
 }
 
 // RunSmbStatusLocks executes 'smbstatus -L' on host container
@@ -215,16 +217,16 @@ func RunSmbStatusProcs() ([]SmbStatusProc, error) {
 
 // SmbStatusSharesByMachine converts the output of RunSmbStatusShares into map
 // indexed by machine's host
-func SmbStatusSharesByMachine() (map[string][]SmbStatusShare, error) {
+func SmbStatusSharesByMachine() (map[string][]SmbStatusTreeCon, error) {
 	shares, err := RunSmbStatusShares()
 	if err != nil {
-		return map[string][]SmbStatusShare{}, err
+		return map[string][]SmbStatusTreeCon{}, err
 	}
 	return makeSmbSharesMap(shares), nil
 }
 
-func makeSmbSharesMap(shares []SmbStatusShare) map[string][]SmbStatusShare {
-	ret := map[string][]SmbStatusShare{}
+func makeSmbSharesMap(shares []SmbStatusTreeCon) map[string][]SmbStatusTreeCon {
+	ret := map[string][]SmbStatusTreeCon{}
 	for _, share := range shares {
 		ret[share.Machine] = append(ret[share.Machine], share)
 	}
@@ -251,8 +253,8 @@ func executeCommand(command string, arg ...string) (string, error) {
 
 // parseSmbStatusShares parses to output of 'smbstatus -S' into internal
 // representation.
-func parseSmbStatusShares(data string) ([]SmbStatusShare, error) {
-	shares := []SmbStatusShare{}
+func parseSmbStatusShares(data string) ([]SmbStatusTreeCon, error) {
+	shares := []SmbStatusTreeCon{}
 	serviceIndex := 0
 	pidIndex := 0
 	machineIndex := 0
@@ -287,7 +289,7 @@ func parseSmbStatusShares(data string) ([]SmbStatusShare, error) {
 			continue
 		}
 		// Parse data into internal repr
-		share := SmbStatusShare{}
+		share := SmbStatusTreeCon{}
 		share.Service = parseSubstr(ln, serviceIndex)
 		share.ServerID.PID = parseSubstr(ln, pidIndex)
 		share.Machine = parseSubstr(ln, machineIndex)
