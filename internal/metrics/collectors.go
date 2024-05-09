@@ -119,7 +119,7 @@ type smbLocksCollector struct {
 }
 
 func (col *smbLocksCollector) Collect(ch chan<- prometheus.Metric) {
-	locks, _ := RunSmbStatusLocks()
+	locks, _ := RunSmbStatusLockedFiles()
 	ch <- prometheus.MustNewConstMetric(col.dsc[0],
 		prometheus.GaugeValue, float64(len(locks)))
 }

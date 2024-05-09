@@ -149,19 +149,13 @@ func RunSmbStatusVersion() (string, error) {
 	return ver, nil
 }
 
-// RunSmbStatusShares executes 'smbstatus -S' on host container
+// RunSmbStatusShares executes 'smbstatus -S --json' on host container
 func RunSmbStatusShares() ([]SmbStatusTreeCon, error) {
-	// Case 1: using new json output
 	dat, err := executeSmbStatusCommand("-S --json")
-	if err == nil {
-		return parseSmbStatusSharesAsJSON(dat)
+	if err != nil {
+		return []SmbStatusTreeCon{}, err
 	}
-	// Case 2: fallback to raw-text output
-	dat, err = executeSmbStatusCommand("-S")
-	if err == nil {
-		return parseSmbStatusShares(dat)
-	}
-	return []SmbStatusTreeCon{}, err
+	return parseSmbStatusSharesAsJSON(dat)
 }
 
 func parseSmbStatusSharesAsJSON(dat string) ([]SmbStatusTreeCon, error) {
@@ -174,15 +168,6 @@ func parseSmbStatusSharesAsJSON(dat string) ([]SmbStatusTreeCon, error) {
 		tcons = append(tcons, share)
 	}
 	return tcons, nil
-}
-
-// RunSmbStatusLocks executes 'smbstatus -L' on host container
-func RunSmbStatusLocks() ([]SmbStatusLock, error) {
-	dat, err := executeSmbStatusCommand("-L")
-	if err != nil {
-		return []SmbStatusLock{}, err
-	}
-	return parseSmbStatusLocks(dat)
 }
 
 // RunSmbStatusLocks executes 'smbstatus -L --json' on host container
@@ -204,15 +189,6 @@ func parseSmbStatusLocksAsJSON(dat string) ([]SmbStatusLockedFile, error) {
 		lockedFiles = append(lockedFiles, lfile)
 	}
 	return lockedFiles, nil
-}
-
-// RunSmbStatusProcs executes 'smbstatus -p' on host container
-func RunSmbStatusProcs() ([]SmbStatusProc, error) {
-	dat, err := executeSmbStatusCommand("-p")
-	if err != nil {
-		return []SmbStatusProc{}, err
-	}
-	return parseSmbStatusProcs(dat)
 }
 
 // SmbStatusSharesByMachine converts the output of RunSmbStatusShares into map
@@ -249,185 +225,6 @@ func executeCommand(command string, arg ...string) (string, error) {
 	}
 	res := strings.TrimSpace(string(out))
 	return res, nil
-}
-
-// parseSmbStatusShares parses to output of 'smbstatus -S' into internal
-// representation.
-func parseSmbStatusShares(data string) ([]SmbStatusTreeCon, error) {
-	shares := []SmbStatusTreeCon{}
-	serviceIndex := 0
-	pidIndex := 0
-	machineIndex := 0
-	connectedAtIndex := 0
-	encryptionIndex := 0
-	signingIndex := 0
-	hasDashLine := false
-	lines := strings.Split(data, "\n")
-	for _, line := range lines {
-		ln := strings.TrimSpace(line)
-		// Ignore empty and coment lines
-		if len(ln) == 0 || ln[0] == '#' {
-			continue
-		}
-		// Detect the all-dash line
-		if strings.HasPrefix(ln, "------") {
-			hasDashLine = true
-			continue
-		}
-		// Parse header line into index of data
-		if strings.HasPrefix(ln, "Service") {
-			serviceIndex = strings.Index(ln, "Service")
-			pidIndex = strings.Index(ln, "pid")
-			machineIndex = strings.Index(ln, "Machine")
-			connectedAtIndex = strings.Index(ln, "Connected at")
-			encryptionIndex = strings.Index(ln, "Encryption")
-			signingIndex = strings.Index(ln, "Signing")
-			continue
-		}
-		// Ignore lines before header
-		if !hasDashLine {
-			continue
-		}
-		// Parse data into internal repr
-		share := SmbStatusTreeCon{}
-		share.Service = parseSubstr(ln, serviceIndex)
-		share.ServerID.PID = parseSubstr(ln, pidIndex)
-		share.Machine = parseSubstr(ln, machineIndex)
-		share.ConnectedAt = parseSubstr2(ln, connectedAtIndex, encryptionIndex)
-		share.Encryption.Cipher = parseSubstr(ln, encryptionIndex)
-		share.Signing.Cipher = parseSubstr(ln, signingIndex)
-
-		// Ignore "IPC$"
-		if share.Service == "IPC$" {
-			continue
-		}
-
-		shares = append(shares, share)
-	}
-	return shares, nil
-}
-
-// parseSmbStatusProcs parses to output of 'smbstatus -p' into internal
-// representation.
-func parseSmbStatusProcs(data string) ([]SmbStatusProc, error) {
-	procs := []SmbStatusProc{}
-	pidIndex := 0
-	usernameIndex := 0
-	groupIndex := 0
-	machineIndex := 0
-	protocolVersionIndex := 0
-	encryptionIndex := 0
-	signingIndex := 0
-	hasDashLine := false
-	lines := strings.Split(data, "\n")
-	for _, line := range lines {
-		ln := strings.TrimSpace(line)
-		// Ignore empty and coment lines
-		if len(ln) == 0 || ln[0] == '#' {
-			continue
-		}
-		// Detect the all-dash line
-		if strings.HasPrefix(ln, "------") {
-			hasDashLine = true
-			continue
-		}
-		// Parse header line into index of data
-		if strings.HasPrefix(ln, "PID") {
-			pidIndex = strings.Index(ln, "PID")
-			usernameIndex = strings.Index(ln, "Username")
-			groupIndex = strings.Index(ln, "Group")
-			machineIndex = strings.Index(ln, "Machine")
-			protocolVersionIndex = strings.Index(ln, "Protocol Version")
-			encryptionIndex = strings.Index(ln, "Encryption")
-			signingIndex = strings.Index(ln, "Signing")
-			continue
-		}
-		// Ignore lines before header
-		if !hasDashLine {
-			continue
-		}
-		// Parse data into internal repr
-		proc := SmbStatusProc{}
-		proc.PID = parseSubstr(ln, pidIndex)
-		proc.Username = parseSubstr(ln, usernameIndex)
-		proc.Group = parseSubstr(ln, groupIndex)
-		proc.Machine = parseSubstr(ln, machineIndex)
-		proc.ProtocolVersion = parseSubstr(ln, protocolVersionIndex)
-		proc.Encryption = parseSubstr(ln, encryptionIndex)
-		proc.Signing = parseSubstr(ln, signingIndex)
-		procs = append(procs, proc)
-	}
-	return procs, nil
-}
-
-// parseSmbStatusLocks parses to output of 'smbstatus -L' into internal
-// representation.
-func parseSmbStatusLocks(data string) ([]SmbStatusLock, error) {
-	locks := []SmbStatusLock{}
-	pidIndex := 0
-	userIndex := 0
-	denyModeIndex := 0
-	accessIndex := 0
-	rwIndex := 0
-	oplockIndex := 0
-	sharePathIndex := 0
-	hasDashLine := false
-	lines := strings.Split(data, "\n")
-	for _, line := range lines {
-		ln := strings.TrimSpace(line)
-		// Ignore empty and coment lines
-		if len(ln) == 0 || ln[0] == '#' {
-			continue
-		}
-		// Detect the all-dash line
-		if strings.HasPrefix(ln, "------") {
-			hasDashLine = true
-			continue
-		}
-		// Ignore generic-info line
-		if strings.HasPrefix(ln, "Locked files") {
-			continue
-		}
-		// Parse header line into index of data
-		if strings.HasPrefix(ln, "Pid") {
-			pidIndex = strings.Index(ln, "Pid")
-			userIndex = strings.Index(ln, "User")
-			denyModeIndex = strings.Index(ln, "DenyMode")
-			accessIndex = strings.Index(ln, "Access")
-			rwIndex = strings.Index(ln, "R/W")
-			oplockIndex = strings.Index(ln, "Oplock")
-			sharePathIndex = strings.Index(ln, "SharePath")
-			continue
-		}
-		// Ignore lines before header
-		if !hasDashLine {
-			continue
-		}
-		// Parse data into internal repr
-		lock := SmbStatusLock{}
-		lock.PID = parseSubstr(ln, pidIndex)
-		lock.UserID = parseSubstr(ln, userIndex)
-		lock.DenyMode = parseSubstr(ln, denyModeIndex)
-		lock.Access = parseSubstr(ln, accessIndex)
-		lock.RW = parseSubstr(ln, rwIndex)
-		lock.Oplock = parseSubstr(ln, oplockIndex)
-		lock.SharePath = parseSubstr(ln, sharePathIndex)
-		locks = append(locks, lock)
-	}
-	return locks, nil
-}
-
-func parseSubstr(s string, startIndex int) string {
-	sub := strings.TrimSpace(s[startIndex:])
-	fields := strings.Fields(sub)
-	if len(fields) == 0 {
-		return ""
-	}
-	return fields[0]
-}
-
-func parseSubstr2(s string, startIndex, endIndex int) string {
-	return strings.TrimSpace(s[startIndex:endIndex])
 }
 
 func ParseTime(s string) (time.Time, error) {

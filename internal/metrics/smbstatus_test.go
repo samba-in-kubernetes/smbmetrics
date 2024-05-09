@@ -11,44 +11,6 @@ import (
 //revive:disable line-length-limit
 //nolint:revive,lll
 var (
-	outputSmbStatusS = `
-
-	Service      pid     Machine       Connected at                     Encryption   Signing
-	----------------------------------------------------------------------------------------
-	share_test   13668   10.66.208.149 Wed Sep 27 10:33:55 AM 2017 CST  -            -
-	share_test2  13669   10.66.208.149 Wed Sep 27 10:35:56 AM 2022 CST  -            -
-	IPC$         651248  10.0.0.100    Sat Sep  4 10:37:01 AM 2020 MDT  -            -
-
-`
-
-	outputSmbStatusS2 = `
-
-Service      pid     Machine       Connected at                     Encryption Signing
----------------------------------------------------------------------------------------------
-samba-share  295     ::1           Thu Apr  7 14:33:19 2022 UTC     -          -
-IPC$         295     ::1           Thu Apr  7 14:33:19 2022 UTC     -          -
-
-`
-
-	outputSmbStatusp = `
-
-Samba version 4.14.12
-PID     Username     Group        Machine                                   Protocol Version  Encryption           Signing
-----------------------------------------------------------------------------------------------------------------------------------------
-245     user         user         127.0.0.1 (ipv4:127.0.0.1:55106)          SMB3_11           -                    partial(AES-128-CMAC)
-9701    root         wheel        10.0.0.2 (ipv4:10.0.0.2:55107)            SMB3_12           -                    partial(AES-128-CMAC)
-
-`
-
-	outputSmbStatusL = `
-
-Locked files:
-Pid          User(ID)   DenyMode   Access      R/W        Oplock           SharePath   Name   Time
---------------------------------------------------------------------------------------------------
-241          1001       DENY_NONE  0x120089    RDONLY     LEASE(RWH)       /mnt/514cd7ba-d858-4d3a-bed9-68e4e524493b   A/a   Mon Feb 21 13:07:46 2022
-
-`
-
 	outputSmbStatusJSON = `
 {
 	"timestamp": "2022-07-19T16:26:34.652845+0530",
@@ -591,26 +553,6 @@ Pid          User(ID)   DenyMode   Access      R/W        Oplock           Share
 
 //revive:enable line-length-limit
 
-func TestParseSmbStatusShares(t *testing.T) {
-	shares, err := parseSmbStatusShares(outputSmbStatusS)
-	assert.NoError(t, err)
-	assert.Equal(t, len(shares), 2)
-	share1 := shares[0]
-	assert.Equal(t, share1.Service, "share_test")
-	assert.Equal(t, share1.ServerID.PID, "13668")
-	assert.Equal(t, share1.Machine, "10.66.208.149")
-	assert.Equal(t, share1.Encryption.Cipher, "-")
-	assert.Equal(t, share1.Signing.Cipher, "-")
-
-	shares, err = parseSmbStatusShares(outputSmbStatusS2)
-	assert.NoError(t, err)
-	assert.Equal(t, len(shares), 1)
-	share1 = shares[0]
-	assert.Equal(t, share1.Service, "samba-share")
-	assert.Equal(t, share1.ServerID.PID, "295")
-	assert.Equal(t, share1.Machine, "::1")
-}
-
 func TestParseSmbStatusSharesJSON(t *testing.T) {
 	dat, err := parseSmbStatusJSON(outputSmbStatusJSON)
 	assert.NoError(t, err)
@@ -647,33 +589,6 @@ func TestParseSmbStatusAllJSON(t *testing.T) {
 	dat2, err := parseSmbStatusJSON(outputSmbStatusAllJSON2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat2.LockedFiles), 2)
-}
-
-func TestParseSmbStatusProcs(t *testing.T) {
-	procs, err := parseSmbStatusProcs(outputSmbStatusp)
-	assert.NoError(t, err)
-	assert.Equal(t, len(procs), 2)
-	proc1 := procs[0]
-	assert.Equal(t, proc1.PID, "245")
-	assert.Equal(t, proc1.Username, "user")
-	assert.Equal(t, proc1.Group, "user")
-	assert.Equal(t, proc1.ProtocolVersion, "SMB3_11")
-	proc2 := procs[1]
-	assert.Equal(t, proc2.PID, "9701")
-	assert.Equal(t, proc2.Username, "root")
-	assert.Equal(t, proc2.Group, "wheel")
-	assert.Equal(t, proc2.ProtocolVersion, "SMB3_12")
-}
-
-func TestParseSmbStatusLocks(t *testing.T) {
-	locks, err := parseSmbStatusLocks(outputSmbStatusL)
-	assert.NoError(t, err)
-	assert.Equal(t, len(locks), 1)
-	lock1 := locks[0]
-	assert.Equal(t, lock1.PID, "241")
-	assert.Equal(t, lock1.UserID, "1001")
-	assert.Equal(t, lock1.DenyMode, "DENY_NONE")
-	assert.Equal(t, lock1.RW, "RDONLY")
 }
 
 func TestParseSmbStatusLocksJSON(t *testing.T) {
