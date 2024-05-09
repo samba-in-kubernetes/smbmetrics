@@ -11,7 +11,7 @@ import (
 //revive:disable line-length-limit
 //nolint:revive,lll
 var (
-	outputSmbStatusJSON = `
+	smbstatusOutput1 = `
 {
 	"timestamp": "2022-07-19T16:26:34.652845+0530",
 	"version": "4.17.0pre1-GIT-130283cbae0",
@@ -63,7 +63,7 @@ var (
   }
   `
 
-	outputSmbStatusJSON2 = `
+	smbstatusOutput2 = `
   {
 	"timestamp": "2023-06-07T11:49:05.528375+0000",
 	"version": "4.17.8",
@@ -93,7 +93,7 @@ var (
 	}
   }`
 
-	outputSmbStatusAllJSON = `
+	smbstatusOutput3 = `
   {
 	"timestamp": "2022-04-15T18:25:15.364891+0200",
 	"version": "4.17.0pre1-GIT-a0f12b9c80b",
@@ -217,7 +217,7 @@ var (
 
   `
 
-	outputSmbStatusAllJSON2 = `
+	smbstatusOutput4 = `
   {
 	"timestamp": "2022-07-20T12:07:36.225955+0000",
 	"version": "4.17.0pre1-UNKNOWN",
@@ -414,7 +414,7 @@ var (
   }
   `
 
-	outputSmbStatusLocksJSON = `
+	smbstatusLocksOutput = `
   {
 	"timestamp": "2024-04-14T14:53:34.901974+0300",
 	"version": "4.21.0pre1-GIT-58a018fb7ad",
@@ -553,16 +553,16 @@ var (
 
 //revive:enable line-length-limit
 
-func TestParseSmbStatusSharesJSON(t *testing.T) {
-	dat, err := parseSmbStatusJSON(outputSmbStatusJSON)
+func TestParseSmbStatusTCons(t *testing.T) {
+	dat, err := parseSmbStatus(smbstatusOutput1)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.TCons), 2)
 
-	dat, err = parseSmbStatusJSON(outputSmbStatusJSON2)
+	dat, err = parseSmbStatus(smbstatusOutput2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.TCons), 1)
 
-	shares, err := parseSmbStatusSharesAsJSON(outputSmbStatusJSON2)
+	shares, err := parseSmbStatusTreeCons(smbstatusOutput2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(shares), 1)
 	share1 := shares[0]
@@ -579,20 +579,20 @@ func TestParseSmbStatusSharesJSON(t *testing.T) {
 	}
 }
 
-func TestParseSmbStatusAllJSON(t *testing.T) {
-	dat, err := parseSmbStatusJSON(outputSmbStatusAllJSON)
+func TestParseSmbStatusAll(t *testing.T) {
+	dat, err := parseSmbStatus(smbstatusOutput3)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.Sessions), 1)
 	assert.Equal(t, len(dat.TCons), 1)
 	assert.Equal(t, len(dat.LockedFiles), 1)
 
-	dat2, err := parseSmbStatusJSON(outputSmbStatusAllJSON2)
+	dat2, err := parseSmbStatus(smbstatusOutput4)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat2.LockedFiles), 2)
 }
 
-func TestParseSmbStatusLocksJSON(t *testing.T) {
-	locks, err := parseSmbStatusLocksAsJSON(outputSmbStatusLocksJSON)
+func TestParseSmbStatusLocks(t *testing.T) {
+	locks, err := parseSmbStatusLockedFiles(smbstatusLocksOutput)
 	assert.NoError(t, err)
 	assert.Equal(t, len(locks), 2)
 	lock1 := locks[0]
