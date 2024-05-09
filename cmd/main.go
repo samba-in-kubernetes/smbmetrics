@@ -31,7 +31,10 @@ func main() {
 	vers, _ := metrics.ResolveVersions(nil)
 	log.Info("Versions", "Versions", vers)
 
-	log.Info("Self", "PodID", metrics.GetSelfPodID())
+	podid := metrics.GetSelfPodID()
+	if len(podid.Name) > 0 {
+		log.Info("Self", "PodID", podid)
+	}
 
 	loc, err := metrics.LocateSmbStatus()
 	if err != nil {
