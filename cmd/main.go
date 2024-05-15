@@ -33,12 +33,12 @@ func main() {
 
 	log.Info("Self", "PodID", metrics.GetSelfPodID())
 
-	loc, err := metrics.LocateSmbStatus()
+	loc, err := metrics.LocateSMBStatus()
 	if err != nil {
 		log.Error(err, "Failed to locate smbstatus")
 		os.Exit(1)
 	}
-	ver, err := metrics.RunSmbStatusVersion()
+	ver, err := metrics.RunSMBStatusVersion()
 	if err != nil {
 		log.Error(err, "Failed to run smbstatus")
 		os.Exit(1)

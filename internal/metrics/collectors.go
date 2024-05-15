@@ -85,7 +85,7 @@ type smbSharesCollector struct {
 
 func (col *smbSharesCollector) Collect(ch chan<- prometheus.Metric) {
 	sharesTotal := 0
-	sharesMap, _ := SmbStatusSharesByMachine()
+	sharesMap, _ := SMBStatusSharesByMachine()
 	for machine, share := range sharesMap {
 		sharesCount := len(share)
 		ch <- prometheus.MustNewConstMetric(col.dsc[0],
@@ -119,7 +119,7 @@ type smbLocksCollector struct {
 }
 
 func (col *smbLocksCollector) Collect(ch chan<- prometheus.Metric) {
-	locks, _ := RunSmbStatusLocks()
+	locks, _ := RunSMBStatusLocks()
 	ch <- prometheus.MustNewConstMetric(col.dsc[0],
 		prometheus.GaugeValue, float64(len(locks)))
 }
