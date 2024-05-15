@@ -553,16 +553,16 @@ var (
 
 //revive:enable line-length-limit
 
-func TestParseSmbStatusTCons(t *testing.T) {
-	dat, err := parseSmbStatus(smbstatusOutput1)
+func TestParseSMBStatusTCons(t *testing.T) {
+	dat, err := parseSMBStatus(smbstatusOutput1)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.TCons), 2)
 
-	dat, err = parseSmbStatus(smbstatusOutput2)
+	dat, err = parseSMBStatus(smbstatusOutput2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.TCons), 1)
 
-	shares, err := parseSmbStatusTreeCons(smbstatusOutput2)
+	shares, err := parseSMBStatusTreeCons(smbstatusOutput2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(shares), 1)
 	share1 := shares[0]
@@ -579,20 +579,20 @@ func TestParseSmbStatusTCons(t *testing.T) {
 	}
 }
 
-func TestParseSmbStatusAll(t *testing.T) {
-	dat, err := parseSmbStatus(smbstatusOutput3)
+func TestParseSMBStatusAll(t *testing.T) {
+	dat, err := parseSMBStatus(smbstatusOutput3)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.Sessions), 1)
 	assert.Equal(t, len(dat.TCons), 1)
 	assert.Equal(t, len(dat.LockedFiles), 1)
 
-	dat2, err := parseSmbStatus(smbstatusOutput4)
+	dat2, err := parseSMBStatus(smbstatusOutput4)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat2.LockedFiles), 2)
 }
 
-func TestParseSmbStatusLocks(t *testing.T) {
-	locks, err := parseSmbStatusLockedFiles(smbstatusLocksOutput)
+func TestParseSMBStatusLocks(t *testing.T) {
+	locks, err := parseSMBStatusLockedFiles(smbstatusLocksOutput)
 	assert.NoError(t, err)
 	assert.Equal(t, len(locks), 2)
 	lock1 := locks[0]

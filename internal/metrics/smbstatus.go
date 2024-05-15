@@ -10,42 +10,42 @@ import (
 	"strings"
 )
 
-// SmbStatusServerID represents a server_id output field
-type SmbStatusServerID struct {
+// SMBStatusServerID represents a server_id output field
+type SMBStatusServerID struct {
 	PID      string `json:"pid"`
 	TaskID   string `json:"task_id"`
 	VNN      string `json:"vnn"`
 	UniqueID string `json:"unique_id"`
 }
 
-// SmbStatusEncryption represents a encryption output field
-type SmbStatusEncryption struct {
+// SMBStatusEncryption represents a encryption output field
+type SMBStatusEncryption struct {
 	Cipher string `json:"cipher"`
 	Degree string `json:"degree"`
 }
 
-// SmbStatusSigning represents a signing output field
-type SmbStatusSigning struct {
+// SMBStatusSigning represents a signing output field
+type SMBStatusSigning struct {
 	Cipher string `json:"cipher"`
 	Degree string `json:"degree"`
 }
 
-// SmbStatusTreeCon represents a 'tcon' output field
-type SmbStatusTreeCon struct {
+// SMBStatusTreeCon represents a 'tcon' output field
+type SMBStatusTreeCon struct {
 	Service     string              `json:"service"`
-	ServerID    SmbStatusServerID   `json:"server_id"`
+	ServerID    SMBStatusServerID   `json:"server_id"`
 	TConID      string              `json:"tcon_id"`
 	SessionID   string              `json:"session_id"`
 	Machine     string              `json:"machine"`
 	ConnectedAt string              `json:"connected_at"`
-	Encryption  SmbStatusEncryption `json:"encryption"`
-	Signing     SmbStatusSigning    `json:"signing"`
+	Encryption  SMBStatusEncryption `json:"encryption"`
+	Signing     SMBStatusSigning    `json:"signing"`
 }
 
-// SmbStatusSession represents a session output field
-type SmbStatusSession struct {
+// SMBStatusSession represents a session output field
+type SMBStatusSession struct {
 	SessionID      string              `json:"session_id"`
-	ServerID       SmbStatusServerID   `json:"server_id"`
+	ServerID       SMBStatusServerID   `json:"server_id"`
 	UID            int                 `json:"uid"`
 	GID            int                 `json:"gid"`
 	Username       string              `json:"username"`
@@ -57,45 +57,45 @@ type SmbStatusSession struct {
 	Hostname       string              `json:"hostname"`
 	SessionDialect string              `json:"session_dialect"`
 	ClientGUID     string              `json:"client_guid"`
-	Encryption     SmbStatusEncryption `json:"encryption"`
-	Signing        SmbStatusSigning    `json:"signing"`
+	Encryption     SMBStatusEncryption `json:"encryption"`
+	Signing        SMBStatusSigning    `json:"signing"`
 }
 
-// SmbStatusFileID represents a fileid output field
-type SmbStatusFileID struct {
+// SMBStatusFileID represents a fileid output field
+type SMBStatusFileID struct {
 	DevID int64 `json:"devid"`
 	Inode int64 `json:"inode"`
 	Extid int32 `json:"extid"`
 }
 
-// SmbStatusLockedFile represents a locked-file output field
-type SmbStatusLockedFile struct {
+// SMBStatusLockedFile represents a locked-file output field
+type SMBStatusLockedFile struct {
 	ServicePath       string          `json:"service_path"`
 	Filename          string          `json:"filename"`
-	FileID            SmbStatusFileID `json:"fileid"`
+	FileID            SMBStatusFileID `json:"fileid"`
 	NumPendingDeletes int             `json:"num_pending_deletes"`
 }
 
-// SmbStatus represents output of 'smbstatus --json'
-type SmbStatus struct {
+// SMBStatus represents output of 'smbstatus --json'
+type SMBStatus struct {
 	Timestamp   string                         `json:"timestamp"`
 	Version     string                         `json:"version"`
 	SmbConf     string                         `json:"smb_conf"`
-	Sessions    map[string]SmbStatusSession    `json:"sessions"`
-	TCons       map[string]SmbStatusTreeCon    `json:"tcons"`
-	LockedFiles map[string]SmbStatusLockedFile `json:"locked_files"`
+	Sessions    map[string]SMBStatusSession    `json:"sessions"`
+	TCons       map[string]SMBStatusTreeCon    `json:"tcons"`
+	LockedFiles map[string]SMBStatusLockedFile `json:"locked_files"`
 }
 
-// SmbStatusLocks represents output of 'smbstatus -L --json'
-type SmbStatusLocks struct {
+// SMBStatusLocks represents output of 'smbstatus -L --json'
+type SMBStatusLocks struct {
 	Timestamp string                         `json:"timestamp"`
 	Version   string                         `json:"version"`
 	SmbConf   string                         `json:"smb_conf"`
-	OpenFiles map[string]SmbStatusLockedFile `json:"open_files"`
+	OpenFiles map[string]SMBStatusLockedFile `json:"open_files"`
 }
 
-// LocateSmbStatus finds the local executable of 'smbstatus' on host.
-func LocateSmbStatus() (string, error) {
+// LocateSMBStatus finds the local executable of 'smbstatus' on host.
+func LocateSMBStatus() (string, error) {
 	knowns := []string{
 		"/usr/bin/smbstatus",
 	}
@@ -115,27 +115,27 @@ func LocateSmbStatus() (string, error) {
 	return "", errors.New("failed to locate smbstatus")
 }
 
-// RunSmbStatusVersion executes 'smbstatus --version' on host container
-func RunSmbStatusVersion() (string, error) {
-	ver, err := executeSmbStatusCommand("--version")
+// RunSMBStatusVersion executes 'smbstatus --version' on host container
+func RunSMBStatusVersion() (string, error) {
+	ver, err := executeSMBStatusCommand("--version")
 	if err != nil {
 		return "", err
 	}
 	return ver, nil
 }
 
-// RunSmbStatusShares executes 'smbstatus --shares --json' on host
-func RunSmbStatusShares() ([]SmbStatusTreeCon, error) {
-	dat, err := executeSmbStatusCommand("--shares --json")
+// RunSMBStatusShares executes 'smbstatus --shares --json' on host
+func RunSMBStatusShares() ([]SMBStatusTreeCon, error) {
+	dat, err := executeSMBStatusCommand("--shares --json")
 	if err != nil {
-		return []SmbStatusTreeCon{}, err
+		return []SMBStatusTreeCon{}, err
 	}
-	return parseSmbStatusTreeCons(dat)
+	return parseSMBStatusTreeCons(dat)
 }
 
-func parseSmbStatusTreeCons(dat string) ([]SmbStatusTreeCon, error) {
-	tcons := []SmbStatusTreeCon{}
-	res, err := parseSmbStatus(dat)
+func parseSMBStatusTreeCons(dat string) ([]SMBStatusTreeCon, error) {
+	tcons := []SMBStatusTreeCon{}
+	res, err := parseSMBStatus(dat)
 	if err != nil {
 		return tcons, err
 	}
@@ -145,18 +145,18 @@ func parseSmbStatusTreeCons(dat string) ([]SmbStatusTreeCon, error) {
 	return tcons, nil
 }
 
-// RunSmbStatusLocks executes 'smbstatus --locks --json' on host
-func RunSmbStatusLocks() ([]SmbStatusLockedFile, error) {
-	dat, err := executeSmbStatusCommand("--locks --json")
+// RunSMBStatusLocks executes 'smbstatus --locks --json' on host
+func RunSMBStatusLocks() ([]SMBStatusLockedFile, error) {
+	dat, err := executeSMBStatusCommand("--locks --json")
 	if err != nil {
-		return []SmbStatusLockedFile{}, err
+		return []SMBStatusLockedFile{}, err
 	}
-	return parseSmbStatusLockedFiles(dat)
+	return parseSMBStatusLockedFiles(dat)
 }
 
-func parseSmbStatusLockedFiles(dat string) ([]SmbStatusLockedFile, error) {
-	lockedFiles := []SmbStatusLockedFile{}
-	res, err := parseSmbStatusLocks(dat)
+func parseSMBStatusLockedFiles(dat string) ([]SMBStatusLockedFile, error) {
+	lockedFiles := []SMBStatusLockedFile{}
+	res, err := parseSMBStatusLocks(dat)
 	if err != nil {
 		return lockedFiles, err
 	}
@@ -166,26 +166,26 @@ func parseSmbStatusLockedFiles(dat string) ([]SmbStatusLockedFile, error) {
 	return lockedFiles, nil
 }
 
-// SmbStatusSharesByMachine converts the output of RunSmbStatusShares into map
+// SMBStatusSharesByMachine converts the output of RunSMBStatusShares into map
 // indexed by machine's host
-func SmbStatusSharesByMachine() (map[string][]SmbStatusTreeCon, error) {
-	tcons, err := RunSmbStatusShares()
+func SMBStatusSharesByMachine() (map[string][]SMBStatusTreeCon, error) {
+	tcons, err := RunSMBStatusShares()
 	if err != nil {
-		return map[string][]SmbStatusTreeCon{}, err
+		return map[string][]SMBStatusTreeCon{}, err
 	}
 	return makeSmbSharesMap(tcons), nil
 }
 
-func makeSmbSharesMap(tcons []SmbStatusTreeCon) map[string][]SmbStatusTreeCon {
-	ret := map[string][]SmbStatusTreeCon{}
+func makeSmbSharesMap(tcons []SMBStatusTreeCon) map[string][]SMBStatusTreeCon {
+	ret := map[string][]SMBStatusTreeCon{}
 	for _, share := range tcons {
 		ret[share.Machine] = append(ret[share.Machine], share)
 	}
 	return ret
 }
 
-func executeSmbStatusCommand(args ...string) (string, error) {
-	loc, err := LocateSmbStatus()
+func executeSMBStatusCommand(args ...string) (string, error) {
+	loc, err := LocateSMBStatus()
 	if err != nil {
 		return "", err
 	}
@@ -202,18 +202,18 @@ func executeCommand(command string, arg ...string) (string, error) {
 	return res, nil
 }
 
-// parseSmbStatus parses to output of 'smbstatus --json' into internal
+// parseSMBStatus parses to output of 'smbstatus --json' into internal
 // representation.
-func parseSmbStatus(data string) (*SmbStatus, error) {
-	res := SmbStatus{}
+func parseSMBStatus(data string) (*SMBStatus, error) {
+	res := SMBStatus{}
 	err := json.Unmarshal([]byte(data), &res)
 	return &res, err
 }
 
-// parseSmbStatusLocks parses to output of 'smbstatus --locks --json' into
+// parseSMBStatusLocks parses to output of 'smbstatus --locks --json' into
 // internal representation.
-func parseSmbStatusLocks(data string) (*SmbStatusLocks, error) {
-	res := SmbStatusLocks{}
+func parseSMBStatusLocks(data string) (*SMBStatusLocks, error) {
+	res := SMBStatusLocks{}
 	err := json.Unmarshal([]byte(data), &res)
 	return &res, err
 }
