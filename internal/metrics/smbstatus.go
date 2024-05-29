@@ -115,6 +115,15 @@ func LocateSMBStatus() (string, error) {
 	return "", errors.New("failed to locate smbstatus")
 }
 
+// RunSMBStatus executes 'smbstatus --json' on host machine
+func RunSMBStatus() (*SMBStatus, error) {
+	dat, err := executeSMBStatusCommand("--json")
+	if err != nil {
+		return &SMBStatus{}, err
+	}
+	return parseSMBStatus(dat)
+}
+
 // RunSMBStatusVersion executes 'smbstatus --version' on host container
 func RunSMBStatusVersion() (string, error) {
 	ver, err := executeSMBStatusCommand("--version")
