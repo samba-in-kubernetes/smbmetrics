@@ -23,7 +23,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${ARCH} GO111MODULE=on \
     -o smbmetrics cmd/main.go
 
 # Use samba-server (with its smb.conf and samba utils) as base image
-FROM quay.io/samba.org/samba-server:v0.3
+FROM quay.io/samba.org/samba-server:v0.5
 COPY --from=builder /workspace/smbmetrics /bin/smbmetrics
 
 ENTRYPOINT ["/bin/smbmetrics"]
