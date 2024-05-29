@@ -205,9 +205,9 @@ func executeCommand(command string, arg ...string) (string, error) {
 // parseSMBStatus parses to output of 'smbstatus --json' into internal
 // representation.
 func parseSMBStatus(data string) (*SMBStatus, error) {
-	res := SMBStatus{}
-	err := json.Unmarshal([]byte(data), &res)
-	return &res, err
+	res := NewSMBStatus()
+	err := json.Unmarshal([]byte(data), res)
+	return res, err
 }
 
 // parseSMBStatusLocks parses to output of 'smbstatus --locks --json' into
@@ -216,4 +216,17 @@ func parseSMBStatusLocks(data string) (*SMBStatusLocks, error) {
 	res := SMBStatusLocks{}
 	err := json.Unmarshal([]byte(data), &res)
 	return &res, err
+}
+
+// NewSMBStatus returns non-populated SMBStatus object
+func NewSMBStatus() *SMBStatus {
+	smbStatus := SMBStatus{
+		Timestamp:   "",
+		Version:     "",
+		SmbConf:     "",
+		Sessions:    map[string]SMBStatusSession{},
+		TCons:       map[string]SMBStatusTreeCon{},
+		LockedFiles: map[string]SMBStatusLockedFile{},
+	}
+	return &smbStatus
 }
