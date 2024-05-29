@@ -34,19 +34,19 @@ _install_tool() {
 }
 
 _install_kustomize() {
-	_install_tool sigs.k8s.io/kustomize/kustomize/v4@v4.5.2
+	_install_tool sigs.k8s.io/kustomize/kustomize/v5@v5.4.0
 }
 
 _install_controller_gen() {
-	_install_tool sigs.k8s.io/controller-tools/cmd/controller-gen@v0.6.2
+	_install_tool sigs.k8s.io/controller-tools/cmd/controller-gen@v0.14.0
 }
 
 _install_revive() {
-	_install_tool github.com/mgechev/revive@v1.2.3
+	_install_tool github.com/mgechev/revive@v1.3.7
 }
 
 _install_golangci_lint() {
-	_install_tool github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.2
+	_install_tool github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
 }
 
 _install_yq() {
@@ -54,7 +54,7 @@ _install_yq() {
 }
 
 _install_gosec() {
-	_install_tool github.com/securego/gosec/v2/cmd/gosec@v2.13.1
+	_install_tool github.com/securego/gosec/v2/cmd/gosec@v2.19.0
 }
 
 _install_gitlint() {

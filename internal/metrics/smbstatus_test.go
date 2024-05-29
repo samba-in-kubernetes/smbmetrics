@@ -11,45 +11,7 @@ import (
 //revive:disable line-length-limit
 //nolint:revive,lll
 var (
-	outputSmbStatusS = `
-
-	Service      pid     Machine       Connected at                     Encryption   Signing
-	----------------------------------------------------------------------------------------
-	share_test   13668   10.66.208.149 Wed Sep 27 10:33:55 AM 2017 CST  -            -
-	share_test2  13669   10.66.208.149 Wed Sep 27 10:35:56 AM 2022 CST  -            -
-	IPC$         651248  10.0.0.100    Sat Sep  4 10:37:01 AM 2020 MDT  -            -
-
-`
-
-	outputSmbStatusS2 = `
-
-Service      pid     Machine       Connected at                     Encryption Signing
----------------------------------------------------------------------------------------------
-samba-share  295     ::1           Thu Apr  7 14:33:19 2022 UTC     -          -
-IPC$         295     ::1           Thu Apr  7 14:33:19 2022 UTC     -          -
-
-`
-
-	outputSmbStatusp = `
-
-Samba version 4.14.12
-PID     Username     Group        Machine                                   Protocol Version  Encryption           Signing
-----------------------------------------------------------------------------------------------------------------------------------------
-245     user         user         127.0.0.1 (ipv4:127.0.0.1:55106)          SMB3_11           -                    partial(AES-128-CMAC)
-9701    root         wheel        10.0.0.2 (ipv4:10.0.0.2:55107)            SMB3_12           -                    partial(AES-128-CMAC)
-
-`
-
-	outputSmbStatusL = `
-
-Locked files:
-Pid          User(ID)   DenyMode   Access      R/W        Oplock           SharePath   Name   Time
---------------------------------------------------------------------------------------------------
-241          1001       DENY_NONE  0x120089    RDONLY     LEASE(RWH)       /mnt/514cd7ba-d858-4d3a-bed9-68e4e524493b   A/a   Mon Feb 21 13:07:46 2022
-
-`
-
-	outputSmbStatusJSON = `
+	smbstatusOutput1 = `
 {
 	"timestamp": "2022-07-19T16:26:34.652845+0530",
 	"version": "4.17.0pre1-GIT-130283cbae0",
@@ -101,7 +63,7 @@ Pid          User(ID)   DenyMode   Access      R/W        Oplock           Share
   }
   `
 
-	outputSmbStatusJSON2 = `
+	smbstatusOutput2 = `
   {
 	"timestamp": "2023-06-07T11:49:05.528375+0000",
 	"version": "4.17.8",
@@ -131,7 +93,7 @@ Pid          User(ID)   DenyMode   Access      R/W        Oplock           Share
 	}
   }`
 
-	outputSmbStatusAllJSON = `
+	smbstatusOutput3 = `
   {
 	"timestamp": "2022-04-15T18:25:15.364891+0200",
 	"version": "4.17.0pre1-GIT-a0f12b9c80b",
@@ -255,7 +217,7 @@ Pid          User(ID)   DenyMode   Access      R/W        Oplock           Share
 
   `
 
-	outputSmbStatusAllJSON2 = `
+	smbstatusOutput4 = `
   {
 	"timestamp": "2022-07-20T12:07:36.225955+0000",
 	"version": "4.17.0pre1-UNKNOWN",
@@ -451,40 +413,156 @@ Pid          User(ID)   DenyMode   Access      R/W        Oplock           Share
 	}
   }
   `
+
+	smbstatusLocksOutput = `
+  {
+	"timestamp": "2024-04-14T14:53:34.901974+0300",
+	"version": "4.21.0pre1-GIT-58a018fb7ad",
+	"smb_conf": "//etc/samba/smb.conf",
+	"open_files": {
+	  "/A/A2/A6/r1": {
+	    "service_path": "/",
+	    "filename": "A/A2/A6/r1",
+	    "fileid": {
+	      "devid": 1,
+	      "inode": 61,
+	      "extid": 0
+	    },
+	    "num_pending_deletes": 0,
+	    "opens": {
+	      "1790/261": {
+		"server_id": {
+		  "pid": "1790",
+		  "task_id": "0",
+		  "vnn": "4294967295",
+		  "unique_id": "3607086338167075363"
+		},
+		"uid": 2222,
+		"share_file_id": "261",
+		"sharemode": {
+		  "hex": "0x00000007",
+		  "READ": true,
+		  "WRITE": true,
+		  "DELETE": true,
+		  "text": "RWD"
+		},
+		"access_mask": {
+		  "hex": "0x00120089",
+		  "READ_DATA": true,
+		  "WRITE_DATA": false,
+		  "APPEND_DATA": false,
+		  "READ_EA": true,
+		  "WRITE_EA": false,
+		  "EXECUTE": false,
+		  "READ_ATTRIBUTES": true,
+		  "WRITE_ATTRIBUTES": false,
+		  "DELETE_CHILD": false,
+		  "DELETE": false,
+		  "READ_CONTROL": true,
+		  "WRITE_DAC": false,
+		  "SYNCHRONIZE": true,
+		  "ACCESS_SYSTEM_SECURITY": false,
+		  "text": "R"
+		},
+		"caching": {
+		  "READ": true,
+		  "WRITE": true,
+		  "HANDLE": false,
+		  "hex": "0x00000005",
+		  "text": "RW"
+		},
+		"oplock": {
+		  "EXCLUSIVE": true,
+		  "BATCH": true,
+		  "LEVEL_II": false,
+		  "LEASE": false,
+		  "text": "BATCH"
+		},
+		"lease": {},
+		"opened_at": "2024-04-14T14:53:15.569085+03:00"
+	      }
+	    }
+	  },
+	  "/A/A1/r2": {
+	    "service_path": "/",
+	    "filename": "A/A1/r2",
+	    "fileid": {
+	      "devid": 2,
+	      "inode": 52,
+	      "extid": 0
+	    },
+	    "num_pending_deletes": 2,
+	    "opens": {
+	      "1790/267": {
+		"server_id": {
+		  "pid": "1790",
+		  "task_id": "0",
+		  "vnn": "4294967295",
+		  "unique_id": "3607086338167075363"
+		},
+		"uid": 1111,
+		"share_file_id": "222",
+		"sharemode": {
+		  "hex": "0x00000007",
+		  "READ": true,
+		  "WRITE": true,
+		  "DELETE": true,
+		  "text": "RWD"
+		},
+		"access_mask": {
+		  "hex": "0x00120089",
+		  "READ_DATA": true,
+		  "WRITE_DATA": false,
+		  "APPEND_DATA": false,
+		  "READ_EA": true,
+		  "WRITE_EA": false,
+		  "EXECUTE": false,
+		  "READ_ATTRIBUTES": true,
+		  "WRITE_ATTRIBUTES": false,
+		  "DELETE_CHILD": false,
+		  "DELETE": false,
+		  "READ_CONTROL": true,
+		  "WRITE_DAC": false,
+		  "SYNCHRONIZE": true,
+		  "ACCESS_SYSTEM_SECURITY": false,
+		  "text": "R"
+		},
+		"caching": {
+		  "READ": true,
+		  "WRITE": true,
+		  "HANDLE": false,
+		  "hex": "0x00000005",
+		  "text": "RW"
+		},
+		"oplock": {
+		  "EXCLUSIVE": true,
+		  "BATCH": true,
+		  "LEVEL_II": false,
+		  "LEASE": false,
+		  "text": "BATCH"
+		},
+		"lease": {},
+		"opened_at": "2024-04-14T14:53:32.258325+03:00"
+	      }
+	    }
+	  }
+	}
+      }
+  `
 )
 
 //revive:enable line-length-limit
 
-func TestParseSmbStatusShares(t *testing.T) {
-	shares, err := parseSmbStatusShares(outputSmbStatusS)
-	assert.NoError(t, err)
-	assert.Equal(t, len(shares), 2)
-	share1 := shares[0]
-	assert.Equal(t, share1.Service, "share_test")
-	assert.Equal(t, share1.ServerID.PID, "13668")
-	assert.Equal(t, share1.Machine, "10.66.208.149")
-	assert.Equal(t, share1.Encryption.Cipher, "-")
-	assert.Equal(t, share1.Signing.Cipher, "-")
-
-	shares, err = parseSmbStatusShares(outputSmbStatusS2)
-	assert.NoError(t, err)
-	assert.Equal(t, len(shares), 1)
-	share1 = shares[0]
-	assert.Equal(t, share1.Service, "samba-share")
-	assert.Equal(t, share1.ServerID.PID, "295")
-	assert.Equal(t, share1.Machine, "::1")
-}
-
-func TestParseSmbStatusSharesJSON(t *testing.T) {
-	dat, err := parseSmbStatusJSON(outputSmbStatusJSON)
+func TestParseSMBStatusTCons(t *testing.T) {
+	dat, err := parseSMBStatus(smbstatusOutput1)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.TCons), 2)
 
-	dat, err = parseSmbStatusJSON(outputSmbStatusJSON2)
+	dat, err = parseSMBStatus(smbstatusOutput2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.TCons), 1)
 
-	shares, err := parseSmbStatusSharesAsJSON(outputSmbStatusJSON2)
+	shares, err := parseSMBStatusTreeCons(smbstatusOutput2)
 	assert.NoError(t, err)
 	assert.Equal(t, len(shares), 1)
 	share1 := shares[0]
@@ -501,41 +579,26 @@ func TestParseSmbStatusSharesJSON(t *testing.T) {
 	}
 }
 
-func TestParseSmbStatusAllJSON(t *testing.T) {
-	dat, err := parseSmbStatusJSON(outputSmbStatusAllJSON)
+func TestParseSMBStatusAll(t *testing.T) {
+	dat, err := parseSMBStatus(smbstatusOutput3)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.Sessions), 1)
 	assert.Equal(t, len(dat.TCons), 1)
 	assert.Equal(t, len(dat.LockedFiles), 1)
 
-	dat2, err := parseSmbStatusJSON(outputSmbStatusAllJSON2)
+	dat2, err := parseSMBStatus(smbstatusOutput4)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat2.LockedFiles), 2)
 }
 
-func TestParseSmbStatusProcs(t *testing.T) {
-	procs, err := parseSmbStatusProcs(outputSmbStatusp)
+func TestParseSMBStatusLocks(t *testing.T) {
+	locks, err := parseSMBStatusLockedFiles(smbstatusLocksOutput)
 	assert.NoError(t, err)
-	assert.Equal(t, len(procs), 2)
-	proc1 := procs[0]
-	assert.Equal(t, proc1.PID, "245")
-	assert.Equal(t, proc1.Username, "user")
-	assert.Equal(t, proc1.Group, "user")
-	assert.Equal(t, proc1.ProtocolVersion, "SMB3_11")
-	proc2 := procs[1]
-	assert.Equal(t, proc2.PID, "9701")
-	assert.Equal(t, proc2.Username, "root")
-	assert.Equal(t, proc2.Group, "wheel")
-	assert.Equal(t, proc2.ProtocolVersion, "SMB3_12")
-}
-
-func TestParseSmbStatusLocks(t *testing.T) {
-	locks, err := parseSmbStatusLocks(outputSmbStatusL)
-	assert.NoError(t, err)
-	assert.Equal(t, len(locks), 1)
+	assert.Equal(t, len(locks), 2)
 	lock1 := locks[0]
-	assert.Equal(t, lock1.PID, "241")
-	assert.Equal(t, lock1.UserID, "1001")
-	assert.Equal(t, lock1.DenyMode, "DENY_NONE")
-	assert.Equal(t, lock1.RW, "RDONLY")
+	assert.Equal(t, lock1.FileID.Inode, int64(61))
+	assert.Equal(t, lock1.NumPendingDeletes, 0)
+	lock2 := locks[1]
+	assert.Equal(t, lock2.FileID.Inode, int64(52))
+	assert.Equal(t, lock2.NumPendingDeletes, 2)
 }

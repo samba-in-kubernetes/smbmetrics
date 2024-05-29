@@ -31,14 +31,17 @@ func main() {
 	vers, _ := metrics.ResolveVersions(nil)
 	log.Info("Versions", "Versions", vers)
 
-	log.Info("Self", "PodID", metrics.GetSelfPodID())
+	podid := metrics.GetSelfPodID()
+	if len(podid.Name) > 0 {
+		log.Info("Self", "PodID", podid)
+	}
 
-	loc, err := metrics.LocateSmbStatus()
+	loc, err := metrics.LocateSMBStatus()
 	if err != nil {
 		log.Error(err, "Failed to locate smbstatus")
 		os.Exit(1)
 	}
-	ver, err := metrics.RunSmbStatusVersion()
+	ver, err := metrics.RunSMBStatusVersion()
 	if err != nil {
 		log.Error(err, "Failed to run smbstatus")
 		os.Exit(1)
