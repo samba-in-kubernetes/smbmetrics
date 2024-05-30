@@ -12,9 +12,9 @@ var (
 
 func (sme *smbMetricsExporter) register() error {
 	cols := []prometheus.Collector{
-		sme.newSmbVersionsCollector(),
-		sme.newSmbSharesCollector(),
-		sme.newSmbLocksCollector(),
+		sme.newSMBVersionsCollector(),
+		sme.newSMBSharesCollector(),
+		sme.newSMBLocksCollector(),
 	}
 	for _, c := range cols {
 		if err := sme.reg.Register(c); err != nil {
@@ -60,7 +60,7 @@ func (col *smbVersionsCollector) Collect(ch chan<- prometheus.Metric) {
 	)
 }
 
-func (sme *smbMetricsExporter) newSmbVersionsCollector() prometheus.Collector {
+func (sme *smbMetricsExporter) newSMBVersionsCollector() prometheus.Collector {
 	col := &smbVersionsCollector{}
 	col.sme = sme
 	col.clnt, _ = newKClient()
@@ -97,7 +97,7 @@ func (col *smbSharesCollector) Collect(ch chan<- prometheus.Metric) {
 		prometheus.GaugeValue, float64(sharesTotal))
 }
 
-func (sme *smbMetricsExporter) newSmbSharesCollector() prometheus.Collector {
+func (sme *smbMetricsExporter) newSMBSharesCollector() prometheus.Collector {
 	col := &smbSharesCollector{}
 	col.sme = sme
 	col.dsc = []*prometheus.Desc{
@@ -124,7 +124,7 @@ func (col *smbLocksCollector) Collect(ch chan<- prometheus.Metric) {
 		prometheus.GaugeValue, float64(len(locks)))
 }
 
-func (sme *smbMetricsExporter) newSmbLocksCollector() prometheus.Collector {
+func (sme *smbMetricsExporter) newSMBLocksCollector() prometheus.Collector {
 	col := &smbLocksCollector{}
 	col.sme = sme
 	col.dsc = []*prometheus.Desc{
