@@ -84,17 +84,26 @@ type smbSharesCollector struct {
 }
 
 func (col *smbSharesCollector) Collect(ch chan<- prometheus.Metric) {
-	sharesTotal := 0
-	sharesMap, _ := SMBStatusSharesByMachine()
-	for machine, share := range sharesMap {
-		sharesCount := len(share)
-		ch <- prometheus.MustNewConstMetric(col.dsc[0],
-			prometheus.GaugeValue, float64(sharesCount), machine)
-		sharesTotal += sharesCount
+	total := 0
+	smbInfo, err := NewUpdatedSMBInfo()
+	if err != nil {
+		ch <- prometheus.MustNewConstMetric(col.dsc[1],
+			prometheus.GaugeValue, float64(total))
+		return
 	}
-
+	serviceByMachine := smbInfo.MapServiceToMachines()
+	for serviceID, machineToCount := range serviceByMachine {
+		for machineID, count := range machineToCount {
+			ch <- prometheus.MustNewConstMetric(col.dsc[0],
+				prometheus.GaugeValue,
+				float64(count),
+				serviceID,
+				machineID)
+			total += count
+		}
+	}
 	ch <- prometheus.MustNewConstMetric(col.dsc[1],
-		prometheus.GaugeValue, float64(sharesTotal))
+		prometheus.GaugeValue, float64(total))
 }
 
 func (sme *smbMetricsExporter) newSMBSharesCollector() prometheus.Collector {
@@ -103,12 +112,12 @@ func (sme *smbMetricsExporter) newSMBSharesCollector() prometheus.Collector {
 	col.dsc = []*prometheus.Desc{
 		prometheus.NewDesc(
 			collectorName("shares", "machine"),
-			"Number of shares by host-machine ip",
-			[]string{"machine"}, nil),
+			"Number of currently active shares by host-machine ip",
+			[]string{"service", "machine"}, nil),
 
 		prometheus.NewDesc(
 			collectorName("shares", "total"),
-			"Total number of active shares",
+			"Total number of currently active shares",
 			[]string{}, nil),
 	}
 	return col
@@ -119,9 +128,13 @@ type smbLocksCollector struct {
 }
 
 func (col *smbLocksCollector) Collect(ch chan<- prometheus.Metric) {
-	locks, _ := RunSMBStatusLocks()
+	value := 0
+	smbInfo, err := NewUpdatedSMBInfo()
+	if err == nil {
+		value = smbInfo.TotalLockedFiles()
+	}
 	ch <- prometheus.MustNewConstMetric(col.dsc[0],
-		prometheus.GaugeValue, float64(len(locks)))
+		prometheus.GaugeValue, float64(value))
 }
 
 func (sme *smbMetricsExporter) newSMBLocksCollector() prometheus.Collector {
