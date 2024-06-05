@@ -87,13 +87,13 @@ func (col *smbActivityCollector) Collect(ch chan<- prometheus.Metric) {
 	totalSessions := 0
 	totalTreeCons := 0
 	totalConnectedUsers := 0
-	totalLockedFiles := 0
+	totalOpenFiles := 0
 	smbInfo, err := NewUpdatedSMBInfo()
 	if err == nil {
 		totalSessions = smbInfo.TotalSessions()
 		totalTreeCons = smbInfo.TotalTreeCons()
 		totalConnectedUsers = smbInfo.TotalConnectedUsers()
-		totalLockedFiles = smbInfo.TotalLockedFiles()
+		totalOpenFiles = smbInfo.TotalOpenFiles()
 	}
 	ch <- prometheus.MustNewConstMetric(col.dsc[0],
 		prometheus.GaugeValue, float64(totalSessions))
@@ -105,7 +105,7 @@ func (col *smbActivityCollector) Collect(ch chan<- prometheus.Metric) {
 		prometheus.GaugeValue, float64(totalConnectedUsers))
 
 	ch <- prometheus.MustNewConstMetric(col.dsc[3],
-		prometheus.GaugeValue, float64(totalLockedFiles))
+		prometheus.GaugeValue, float64(totalOpenFiles))
 }
 
 func (sme *smbMetricsExporter) newSMBActivityCollector() prometheus.Collector {
@@ -128,8 +128,8 @@ func (sme *smbMetricsExporter) newSMBActivityCollector() prometheus.Collector {
 			[]string{}, nil),
 
 		prometheus.NewDesc(
-			collectorName("locks", "total"),
-			"Number of currently active file-locks",
+			collectorName("openfiles", "total"),
+			"Number of currently open files",
 			[]string{}, nil),
 	}
 	return col
