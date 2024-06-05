@@ -109,3 +109,18 @@ func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
 	}
 	return ret
 }
+
+func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
+	ret := map[string]map[string]int{}
+	for _, tcon := range smbinfo.smbstat.TCons {
+		serviceID := tcon.Service
+		machineID := tcon.Machine
+		sub, found := ret[machineID]
+		if !found {
+			ret[machineID] = map[string]int{serviceID: 1}
+		} else {
+			sub[serviceID]++
+		}
+	}
+	return ret
+}
