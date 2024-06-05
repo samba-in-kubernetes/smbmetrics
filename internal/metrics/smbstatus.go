@@ -70,10 +70,70 @@ type SMBStatusFileID struct {
 
 // SMBStatusOpenFile represents a open-file output field
 type SMBStatusOpenFile struct {
-	ServicePath       string          `json:"service_path"`
-	Filename          string          `json:"filename"`
-	FileID            SMBStatusFileID `json:"fileid"`
-	NumPendingDeletes int             `json:"num_pending_deletes"`
+	ServicePath       string                       `json:"service_path"`
+	Filename          string                       `json:"filename"`
+	FileID            SMBStatusFileID              `json:"fileid"`
+	NumPendingDeletes int                          `json:"num_pending_deletes"`
+	Opens             map[string]SMBStatusOpenInfo `json:"opens"`
+}
+
+// SMBStatusOpenInfo represents a single entry open_files/opens output field
+type SMBStatusOpenInfo struct {
+	UID         int                     `json:"uid"`
+	ShareFileID string                  `json:"share_file_id"`
+	OpenedAt    string                  `json:"opened_at"`
+	ShareMode   SMBStatusOpenShareMode  `json:"sharemode"`
+	AccessMask  SMBStatusOpenAccessMask `json:"access_mask"`
+	OpLock      SMBStatusOpenOpLock     `json:"oplock"`
+	Lease       SMBStatusOpenLease      `json:"lease"`
+}
+
+// SMBStatusOpenShareMode represents a open file share-mode entry
+type SMBStatusOpenShareMode struct {
+	Read   bool   `json:"READ"`
+	Write  bool   `json:"WRITE"`
+	Delete bool   `json:"DELETE"`
+	Text   string `json:"text"`
+	Hex    string `json:"hex"`
+}
+
+// SMBStatusOpenShareMode represents a open file access-mask entry
+type SMBStatusOpenAccessMask struct {
+	ReadData             bool   `json:"READ_DATA"`
+	WriteData            bool   `json:"WRITE_DATA"`
+	AppendData           bool   `json:"APPEND_DATA"`
+	ReadEA               bool   `json:"READ_EA"`
+	WriteEA              bool   `json:"WRITE_EA"`
+	Execute              bool   `json:"EXECUTE"`
+	ReadAttributes       bool   `json:"READ_ATTRIBUTES"`
+	WriteAttributes      bool   `json:"WRITE_ATTRIBUTES"`
+	DeleteChild          bool   `json:"DELETE_CHILD"`
+	Delete               bool   `json:"DELETE"`
+	ReadControl          bool   `json:"READ_CONTROL"`
+	WriteDAC             bool   `json:"WRITE_DAC"`
+	Synchronize          bool   `json:"SYNCHRONIZE"`
+	AccessSystemSecurity bool   `json:"ACCESS_SYSTEM_SECURITY"`
+	Text                 string `json:"text"`
+	Hex                  string `json:"hex"`
+}
+
+// SMBStatusOpenOplock represents an open file operation-lock entry
+type SMBStatusOpenOpLock struct {
+	Exclusive bool   `json:"EXCLUSIVE"`
+	Batch     bool   `json:"BATCH"`
+	LevelII   bool   `json:"LEVEL_II"`
+	Lease     bool   `json:"LEASE"`
+	Text      string `json:"text"`
+}
+
+// SMBStatusOpenLease represents an open file lease entry
+type SMBStatusOpenLease struct {
+	LeaseKey string `json:"lease_key"`
+	Read     bool   `json:"READ"`
+	Write    bool   `json:"WRITE"`
+	Handle   bool   `json:"HANDLE"`
+	Text     string `json:"text"`
+	Hex      string `json:"hex"`
 }
 
 // SMBStatus represents output of 'smbstatus --json'
