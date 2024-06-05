@@ -166,7 +166,7 @@ var (
 			  "unique_id": "10756714984493602300"
 			},
 			"uid": 1000,
-			"share_file_id": 2,
+			"share_file_id": "2",
 			"sharemode": {
 			  "hex": "0x00000003",
 			  "NONE": false,
@@ -286,7 +286,7 @@ var (
 			  "unique_id": "7364797719700910696"
 			},
 			"uid": 1000,
-			"share_file_id": 61,
+			"share_file_id": "61",
 			"sharemode": {
 			  "hex": "0x00000007",
 			  "NONE": false,
@@ -357,7 +357,7 @@ var (
 			  "unique_id": "7364797719700910696"
 			},
 			"uid": 1000,
-			"share_file_id": 65,
+			"share_file_id": "65",
 			"sharemode": {
 			  "hex": "0x00000007",
 			  "NONE": false,
@@ -414,7 +414,7 @@ var (
   }
   `
 
-	smbstatusLocksOutput = `
+	smbstatusOutput5 = `
   {
 	"timestamp": "2024-04-14T14:53:34.901974+0300",
 	"version": "4.21.0pre1-GIT-58a018fb7ad",
@@ -475,10 +475,17 @@ var (
 		  "EXCLUSIVE": true,
 		  "BATCH": true,
 		  "LEVEL_II": false,
-		  "LEASE": false,
+		  "LEASE": true,
 		  "text": "BATCH"
 		},
-		"lease": {},
+		"lease": {
+			"lease_key": "272e4282-36e6-11ef-8a34-309c2337f855",
+			"hex": "0x00000005",
+			"READ": true,
+			"WRITE": true,
+			"HANDLE": false,
+			"text": "RW"
+		},
 		"opened_at": "2024-04-14T14:53:15.569085+03:00"
 	      }
 	    }
@@ -535,13 +542,12 @@ var (
 		  "text": "RW"
 		},
 		"oplock": {
-		  "EXCLUSIVE": true,
+		  "EXCLUSIVE": false,
 		  "BATCH": true,
 		  "LEVEL_II": false,
 		  "LEASE": false,
 		  "text": "BATCH"
 		},
-		"lease": {},
 		"opened_at": "2024-04-14T14:53:32.258325+03:00"
 	      }
 	    }
@@ -592,7 +598,7 @@ func TestParseSMBStatusAll(t *testing.T) {
 }
 
 func TestParseSMBStatusLocks(t *testing.T) {
-	locks, err := parseSMBStatusLockedFiles(smbstatusLocksOutput)
+	locks, err := parseSMBStatusLockedFiles(smbstatusOutput5)
 	assert.NoError(t, err)
 	assert.Equal(t, len(locks), 2)
 	lock1 := locks[0]
@@ -601,4 +607,32 @@ func TestParseSMBStatusLocks(t *testing.T) {
 	lock2 := locks[1]
 	assert.Equal(t, lock2.FileID.Inode, int64(52))
 	assert.Equal(t, lock2.NumPendingDeletes, 2)
+}
+
+func TestParseSMBStatusOpenFiles(t *testing.T) {
+	status, err := parseSMBStatus(smbstatusOutput5)
+	assert.NoError(t, err)
+	assert.Equal(t, len(status.OpenFiles), 2)
+	for _, openFile := range status.OpenFiles {
+		for _, open := range openFile.Opens {
+			oplock := open.OpLock
+			lease := open.Lease
+			assert.Equal(t, oplock.Batch, true)
+			assert.Equal(t, oplock.LevelII, false)
+			assert.Equal(t, oplock.Text, "BATCH")
+			if oplock.Lease {
+				assert.Equal(t, oplock.Exclusive, true)
+				assert.Equal(t, lease.Handle, false)
+				assert.Equal(t, lease.Read, true)
+				assert.Equal(t, lease.Write, true)
+				assert.Equal(t, lease.Text, "RW")
+			} else {
+				assert.Equal(t, oplock.Exclusive, false)
+				assert.Equal(t, lease.Handle, false)
+				assert.Equal(t, lease.Read, false)
+				assert.Equal(t, lease.Write, false)
+				assert.Equal(t, lease.Text, "")
+			}
+		}
+	}
 }
