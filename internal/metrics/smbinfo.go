@@ -2,6 +2,8 @@
 
 package metrics
 
+import "strings"
+
 // SMBInfo provides a bridge layer between raw smbstatus info and exported
 // metric counters. It also implements the more complex logic which requires in
 // memory re-mapping of the low-level information (e.g., stats by machine/user).
@@ -38,6 +40,18 @@ func (smbinfo *SMBInfo) TotalTreeCons() int {
 
 func (smbinfo *SMBInfo) TotalOpenFiles() int {
 	return len(smbinfo.smbstat.OpenFiles)
+}
+
+func (smbinfo *SMBInfo) TotalOpenFilesAccessRW() int {
+	total := 0
+	for _, openf := range smbinfo.smbstat.OpenFiles {
+		for _, opens := range openf.Opens {
+			if strings.Contains(opens.AccessMask.Text, "RW") {
+				total++
+			}
+		}
+	}
+	return total
 }
 
 func (smbinfo *SMBInfo) TotalConnectedUsers() int {
