@@ -36,8 +36,8 @@ func (smbinfo *SMBInfo) TotalTreeCons() int {
 	return len(smbinfo.smbstat.TCons)
 }
 
-func (smbinfo *SMBInfo) TotalLockedFiles() int {
-	return len(smbinfo.smbstat.LockedFiles)
+func (smbinfo *SMBInfo) TotalOpenFiles() int {
+	return len(smbinfo.smbstat.OpenFiles)
 }
 
 func (smbinfo *SMBInfo) TotalConnectedUsers() int {

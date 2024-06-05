@@ -68,8 +68,8 @@ type SMBStatusFileID struct {
 	Extid int32 `json:"extid"`
 }
 
-// SMBStatusLockedFile represents a locked-file output field
-type SMBStatusLockedFile struct {
+// SMBStatusOpenFile represents a open-file output field
+type SMBStatusOpenFile struct {
 	ServicePath       string          `json:"service_path"`
 	Filename          string          `json:"filename"`
 	FileID            SMBStatusFileID `json:"fileid"`
@@ -78,20 +78,20 @@ type SMBStatusLockedFile struct {
 
 // SMBStatus represents output of 'smbstatus --json'
 type SMBStatus struct {
-	Timestamp   string                         `json:"timestamp"`
-	Version     string                         `json:"version"`
-	SmbConf     string                         `json:"smb_conf"`
-	Sessions    map[string]SMBStatusSession    `json:"sessions"`
-	TCons       map[string]SMBStatusTreeCon    `json:"tcons"`
-	LockedFiles map[string]SMBStatusLockedFile `json:"locked_files"`
+	Timestamp string                       `json:"timestamp"`
+	Version   string                       `json:"version"`
+	SmbConf   string                       `json:"smb_conf"`
+	Sessions  map[string]SMBStatusSession  `json:"sessions"`
+	TCons     map[string]SMBStatusTreeCon  `json:"tcons"`
+	OpenFiles map[string]SMBStatusOpenFile `json:"open_files"`
 }
 
 // SMBStatusLocks represents output of 'smbstatus -L --json'
 type SMBStatusLocks struct {
-	Timestamp string                         `json:"timestamp"`
-	Version   string                         `json:"version"`
-	SmbConf   string                         `json:"smb_conf"`
-	OpenFiles map[string]SMBStatusLockedFile `json:"open_files"`
+	Timestamp string                       `json:"timestamp"`
+	Version   string                       `json:"version"`
+	SmbConf   string                       `json:"smb_conf"`
+	OpenFiles map[string]SMBStatusOpenFile `json:"open_files"`
 }
 
 // LocateSMBStatus finds the local executable of 'smbstatus' on host.
@@ -155,16 +155,16 @@ func parseSMBStatusTreeCons(dat string) ([]SMBStatusTreeCon, error) {
 }
 
 // RunSMBStatusLocks executes 'smbstatus --locks --json' on host
-func RunSMBStatusLocks() ([]SMBStatusLockedFile, error) {
+func RunSMBStatusLocks() ([]SMBStatusOpenFile, error) {
 	dat, err := executeSMBStatusCommand("--locks --json")
 	if err != nil {
-		return []SMBStatusLockedFile{}, err
+		return []SMBStatusOpenFile{}, err
 	}
 	return parseSMBStatusLockedFiles(dat)
 }
 
-func parseSMBStatusLockedFiles(dat string) ([]SMBStatusLockedFile, error) {
-	lockedFiles := []SMBStatusLockedFile{}
+func parseSMBStatusLockedFiles(dat string) ([]SMBStatusOpenFile, error) {
+	lockedFiles := []SMBStatusOpenFile{}
 	res, err := parseSMBStatusLocks(dat)
 	if err != nil {
 		return lockedFiles, err
@@ -230,12 +230,12 @@ func parseSMBStatusLocks(data string) (*SMBStatusLocks, error) {
 // NewSMBStatus returns non-populated SMBStatus object
 func NewSMBStatus() *SMBStatus {
 	smbStatus := SMBStatus{
-		Timestamp:   "",
-		Version:     "",
-		SmbConf:     "",
-		Sessions:    map[string]SMBStatusSession{},
-		TCons:       map[string]SMBStatusTreeCon{},
-		LockedFiles: map[string]SMBStatusLockedFile{},
+		Timestamp: "",
+		Version:   "",
+		SmbConf:   "",
+		Sessions:  map[string]SMBStatusSession{},
+		TCons:     map[string]SMBStatusTreeCon{},
+		OpenFiles: map[string]SMBStatusOpenFile{},
 	}
 	return &smbStatus
 }

@@ -147,7 +147,7 @@ var (
 		}
 	  }
 	},
-	"locked_files": {
+	"open_files": {
 	  "/home/janger/testfolder/hallo": {
 		"service_path": "/home/janger/testfolder",
 		"filename": "hallo",
@@ -267,7 +267,7 @@ var (
 		}
 	  }
 	},
-	"locked_files": {
+	"open_files": {
 	  "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee/a/y": {
 		"service_path": "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee",
 		"filename": "a/y",
@@ -584,11 +584,11 @@ func TestParseSMBStatusAll(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.Sessions), 1)
 	assert.Equal(t, len(dat.TCons), 1)
-	assert.Equal(t, len(dat.LockedFiles), 1)
+	assert.Equal(t, len(dat.OpenFiles), 1)
 
 	dat2, err := parseSMBStatus(smbstatusOutput4)
 	assert.NoError(t, err)
-	assert.Equal(t, len(dat2.LockedFiles), 2)
+	assert.Equal(t, len(dat2.OpenFiles), 2)
 }
 
 func TestParseSMBStatusLocks(t *testing.T) {
