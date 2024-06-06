@@ -35,7 +35,15 @@ func (smbinfo *SMBInfo) TotalSessions() int {
 }
 
 func (smbinfo *SMBInfo) TotalTreeCons() int {
-	return len(smbinfo.smbstat.TCons)
+	total := 0
+	for _, tcon := range smbinfo.smbstat.TCons {
+		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
+		total++
+	}
+	return total
 }
 
 func (smbinfo *SMBInfo) TotalOpenFiles() int {
@@ -79,6 +87,9 @@ func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
 	ret := map[string][]*SMBStatusTreeCon{}
 	for _, tcon := range smbinfo.smbstat.TCons {
 		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
 		tconRef := &tcon
 		ret[serviceID] = append(ret[serviceID], tconRef)
 	}
@@ -88,6 +99,10 @@ func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
 func (smbinfo *SMBInfo) MapMachineToTreeCons() map[string][]*SMBStatusTreeCon {
 	ret := map[string][]*SMBStatusTreeCon{}
 	for _, tcon := range smbinfo.smbstat.TCons {
+		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
 		machineID := tcon.Machine
 		tconRef := &tcon
 		ret[machineID] = append(ret[machineID], tconRef)
@@ -99,6 +114,9 @@ func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
 	ret := map[string]map[string]int{}
 	for _, tcon := range smbinfo.smbstat.TCons {
 		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
 		machineID := tcon.Machine
 		sub, found := ret[serviceID]
 		if !found {
@@ -114,6 +132,9 @@ func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
 	ret := map[string]map[string]int{}
 	for _, tcon := range smbinfo.smbstat.TCons {
 		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
 		machineID := tcon.Machine
 		sub, found := ret[machineID]
 		if !found {
@@ -123,4 +144,8 @@ func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
 		}
 	}
 	return ret
+}
+
+func isInternalServiceID(serviceID string) bool {
+	return serviceID == "IPC$"
 }
