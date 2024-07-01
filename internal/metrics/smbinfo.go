@@ -2,6 +2,8 @@
 
 package metrics
 
+import "strings"
+
 // SMBInfo provides a bridge layer between raw smbstatus info and exported
 // metric counters. It also implements the more complex logic which requires in
 // memory re-mapping of the low-level information (e.g., stats by machine/user).
@@ -33,11 +35,31 @@ func (smbinfo *SMBInfo) TotalSessions() int {
 }
 
 func (smbinfo *SMBInfo) TotalTreeCons() int {
-	return len(smbinfo.smbstat.TCons)
+	total := 0
+	for _, tcon := range smbinfo.smbstat.TCons {
+		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
+		total++
+	}
+	return total
 }
 
 func (smbinfo *SMBInfo) TotalOpenFiles() int {
 	return len(smbinfo.smbstat.OpenFiles)
+}
+
+func (smbinfo *SMBInfo) TotalOpenFilesAccessRW() int {
+	total := 0
+	for _, openf := range smbinfo.smbstat.OpenFiles {
+		for _, opens := range openf.Opens {
+			if strings.Contains(opens.AccessMask.Text, "RW") {
+				total++
+			}
+		}
+	}
+	return total
 }
 
 func (smbinfo *SMBInfo) TotalConnectedUsers() int {
@@ -65,6 +87,9 @@ func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
 	ret := map[string][]*SMBStatusTreeCon{}
 	for _, tcon := range smbinfo.smbstat.TCons {
 		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
 		tconRef := &tcon
 		ret[serviceID] = append(ret[serviceID], tconRef)
 	}
@@ -74,6 +99,10 @@ func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
 func (smbinfo *SMBInfo) MapMachineToTreeCons() map[string][]*SMBStatusTreeCon {
 	ret := map[string][]*SMBStatusTreeCon{}
 	for _, tcon := range smbinfo.smbstat.TCons {
+		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
 		machineID := tcon.Machine
 		tconRef := &tcon
 		ret[machineID] = append(ret[machineID], tconRef)
@@ -85,6 +114,9 @@ func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
 	ret := map[string]map[string]int{}
 	for _, tcon := range smbinfo.smbstat.TCons {
 		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
 		machineID := tcon.Machine
 		sub, found := ret[serviceID]
 		if !found {
@@ -94,4 +126,26 @@ func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
 		}
 	}
 	return ret
+}
+
+func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
+	ret := map[string]map[string]int{}
+	for _, tcon := range smbinfo.smbstat.TCons {
+		serviceID := tcon.Service
+		if isInternalServiceID(serviceID) {
+			continue
+		}
+		machineID := tcon.Machine
+		sub, found := ret[machineID]
+		if !found {
+			ret[machineID] = map[string]int{serviceID: 1}
+		} else {
+			sub[serviceID]++
+		}
+	}
+	return ret
+}
+
+func isInternalServiceID(serviceID string) bool {
+	return serviceID == "IPC$"
 }
