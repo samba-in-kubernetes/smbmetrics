@@ -14,7 +14,7 @@ import (
 
 var (
 	// DefaultMetricsPort is the default port used to export prometheus metrics
-	DefaultMetricsPort = int(8080)
+	DefaultMetricsPort = int(9922)
 	// DefaultMetricsPath is the default HTTP path to export prometheus metrics
 	DefaultMetricsPath = "/metrics"
 )
