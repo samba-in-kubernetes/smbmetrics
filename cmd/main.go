@@ -48,7 +48,7 @@ func main() {
 	}
 	log.Info("Located smbstatus", "path", loc, "version", ver)
 
-	err = metrics.RunSmbMetricsExporter(log)
+	err = metrics.RunSmbMetricsExporter(log, metrics.DefaultMetricsPort)
 	if err != nil {
 		os.Exit(1)
 	}
