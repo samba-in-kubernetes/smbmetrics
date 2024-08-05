@@ -4,6 +4,7 @@ package metrics
 
 import (
 	"context"
+	"errors"
 )
 
 var (
@@ -26,26 +27,17 @@ func UpdateDefaultVersions(version, commitid string) {
 
 // ResolveVersions is a best-effort to resolve current pod's versions info
 func ResolveVersions(clnt *kclient) (Versions, error) {
-	var err error
+	var imgErr, smbVersErr, ctdbVersErr error
 	vers := Versions{
 		Version:  defaultVersions.Version,
 		CommitID: defaultVersions.CommitID,
 	}
 	if clnt != nil {
-		vers.SambaImage, err = resolveSambaImage(clnt)
-		if err != nil {
-			return vers, err
-		}
+		vers.SambaImage, imgErr = resolveSambaImage(clnt)
 	}
-	vers.SambaVersion, err = resolveSambaVersion()
-	if err != nil {
-		return vers, err
-	}
-	vers.CtdbVersion, err = resolveCtdbVersion()
-	if err != nil {
-		return vers, err
-	}
-	return vers, nil
+	vers.SambaVersion, smbVersErr = resolveSambaVersion()
+	vers.CtdbVersion, ctdbVersErr = resolveCtdbVersion()
+	return vers, errors.Join(imgErr, smbVersErr, ctdbVersErr)
 }
 
 func resolveSambaImage(clnt *kclient) (string, error) {
