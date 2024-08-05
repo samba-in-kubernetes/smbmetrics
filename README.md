@@ -16,12 +16,12 @@ $ make image-build
 ## Query metrics
 
 When running (by privileged user) along-side active SMB server, `smbmetrics`
-exports a set of gauge metrics over HTTP via port `8080`. Most metrics become
+exports a set of gauge metrics over HTTP via port `9922`. Most metrics become
 visible only when active SMB connections exists. Execute the folowing `curl`
 command on the same machine where you run `smbmetrics` instance:
 
 ```console
-$ curl --request GET "http://localhost:8080/metrics"
+$ curl --request GET "http://localhost:9922/metrics"
 ```
 
 ## Exported metrics
@@ -45,7 +45,7 @@ The following example is from a setup with 2 shares and 2 users connected and
 performing SMB file-system operations from 4 different machines:
 
 ```console
-$ curl --request GET "http://localhost:8080/metrics"
+$ curl --request GET "http://localhost:9922/metrics"
 
 # HELP smb_metrics_status Current metrics-collector status versions
 # TYPE smb_metrics_status gauge
