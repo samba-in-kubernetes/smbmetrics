@@ -14,7 +14,7 @@ import (
 
 var (
 	// DefaultMetricsPort is the default port used to export prometheus metrics
-	DefaultMetricsPort = int(8080)
+	DefaultMetricsPort = int(9922)
 	// DefaultMetricsPath is the default HTTP path to export prometheus metrics
 	DefaultMetricsPath = "/metrics"
 )
@@ -63,8 +63,11 @@ func (sme *smbMetricsExporter) serve() error {
 
 // RunSmbMetricsExporter executes an HTTP server and exports SMB metrics to
 // Prometheus.
-func RunSmbMetricsExporter(log logr.Logger) error {
-	sme := newSmbMetricsExporter(log, DefaultMetricsPort)
+func RunSmbMetricsExporter(log logr.Logger, port int) error {
+	if port <= 0 {
+		port = DefaultMetricsPort
+	}
+	sme := newSmbMetricsExporter(log, port)
 	err := sme.init()
 	if err != nil {
 		return err

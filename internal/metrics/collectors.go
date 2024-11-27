@@ -12,9 +12,9 @@ var (
 
 func (sme *smbMetricsExporter) register() error {
 	cols := []prometheus.Collector{
-		sme.newSmbVersionsCollector(),
-		sme.newSmbSharesCollector(),
-		sme.newSmbLocksCollector(),
+		sme.newSMBVersionsCollector(),
+		sme.newSMBActivityCollector(),
+		sme.newSMBSharesCollector(),
 	}
 	for _, c := range cols {
 		if err := sme.reg.Register(c); err != nil {
@@ -60,7 +60,7 @@ func (col *smbVersionsCollector) Collect(ch chan<- prometheus.Metric) {
 	)
 }
 
-func (sme *smbMetricsExporter) newSmbVersionsCollector() prometheus.Collector {
+func (sme *smbMetricsExporter) newSMBVersionsCollector() prometheus.Collector {
 	col := &smbVersionsCollector{}
 	col.sme = sme
 	col.clnt, _ = newKClient()
@@ -79,59 +79,107 @@ func (sme *smbMetricsExporter) newSmbVersionsCollector() prometheus.Collector {
 	return col
 }
 
-type smbSharesCollector struct {
+type smbActivityCollector struct {
 	smbCollector
 }
 
-func (col *smbSharesCollector) Collect(ch chan<- prometheus.Metric) {
-	sharesTotal := 0
-	sharesMap, _ := SMBStatusSharesByMachine()
-	for machine, share := range sharesMap {
-		sharesCount := len(share)
-		ch <- prometheus.MustNewConstMetric(col.dsc[0],
-			prometheus.GaugeValue, float64(sharesCount), machine)
-		sharesTotal += sharesCount
+func (col *smbActivityCollector) Collect(ch chan<- prometheus.Metric) {
+	totalSessions := 0
+	totalTreeCons := 0
+	totalConnectedUsers := 0
+	totalOpenFiles := 0
+	totalOpenFilesAccessRW := 0
+	smbInfo, err := NewUpdatedSMBInfo()
+	if err == nil {
+		totalSessions = smbInfo.TotalSessions()
+		totalTreeCons = smbInfo.TotalTreeCons()
+		totalConnectedUsers = smbInfo.TotalConnectedUsers()
+		totalOpenFiles = smbInfo.TotalOpenFiles()
+		totalOpenFilesAccessRW = smbInfo.TotalOpenFilesAccessRW()
 	}
+	ch <- prometheus.MustNewConstMetric(col.dsc[0],
+		prometheus.GaugeValue, float64(totalSessions))
 
 	ch <- prometheus.MustNewConstMetric(col.dsc[1],
-		prometheus.GaugeValue, float64(sharesTotal))
+		prometheus.GaugeValue, float64(totalTreeCons))
+
+	ch <- prometheus.MustNewConstMetric(col.dsc[2],
+		prometheus.GaugeValue, float64(totalConnectedUsers))
+
+	ch <- prometheus.MustNewConstMetric(col.dsc[3],
+		prometheus.GaugeValue, float64(totalOpenFiles))
+
+	ch <- prometheus.MustNewConstMetric(col.dsc[4],
+		prometheus.GaugeValue, float64(totalOpenFilesAccessRW))
 }
 
-func (sme *smbMetricsExporter) newSmbSharesCollector() prometheus.Collector {
-	col := &smbSharesCollector{}
+func (sme *smbMetricsExporter) newSMBActivityCollector() prometheus.Collector {
+	col := &smbActivityCollector{}
 	col.sme = sme
 	col.dsc = []*prometheus.Desc{
 		prometheus.NewDesc(
-			collectorName("shares", "machine"),
-			"Number of shares by host-machine ip",
-			[]string{"machine"}, nil),
+			collectorName("sessions", "total"),
+			"Number of currently active SMB sessions",
+			[]string{}, nil),
 
 		prometheus.NewDesc(
-			collectorName("shares", "total"),
-			"Total number of active shares",
+			collectorName("tcon", "total"),
+			"Number of currently active SMB tree-connections",
+			[]string{}, nil),
+
+		prometheus.NewDesc(
+			collectorName("users", "total"),
+			"Number of currently active SMB users",
+			[]string{}, nil),
+
+		prometheus.NewDesc(
+			collectorName("openfiles", "total"),
+			"Number of currently open files",
+			[]string{}, nil),
+
+		prometheus.NewDesc(
+			collectorName("openfiles", "access_rw"),
+			"Number of open files with read-write access mode",
 			[]string{}, nil),
 	}
 	return col
 }
 
-type smbLocksCollector struct {
+type smbSharesCollector struct {
 	smbCollector
 }
 
-func (col *smbLocksCollector) Collect(ch chan<- prometheus.Metric) {
-	locks, _ := RunSMBStatusLocks()
-	ch <- prometheus.MustNewConstMetric(col.dsc[0],
-		prometheus.GaugeValue, float64(len(locks)))
+func (col *smbSharesCollector) Collect(ch chan<- prometheus.Metric) {
+	smbInfo, _ := NewUpdatedSMBInfo()
+	serviceToMachine := smbInfo.MapServiceToMachines()
+	for service, machines := range serviceToMachine {
+		ch <- prometheus.MustNewConstMetric(col.dsc[0],
+			prometheus.GaugeValue,
+			float64(len(machines)),
+			service)
+	}
+	machineToServices := smbInfo.MapMachineToServies()
+	for machine, services := range machineToServices {
+		ch <- prometheus.MustNewConstMetric(col.dsc[1],
+			prometheus.GaugeValue,
+			float64(len(services)),
+			machine)
+	}
 }
 
-func (sme *smbMetricsExporter) newSmbLocksCollector() prometheus.Collector {
-	col := &smbLocksCollector{}
+func (sme *smbMetricsExporter) newSMBSharesCollector() prometheus.Collector {
+	col := &smbSharesCollector{}
 	col.sme = sme
 	col.dsc = []*prometheus.Desc{
 		prometheus.NewDesc(
-			collectorName("locks", "total"),
-			"Total number of active locks",
-			[]string{}, nil),
+			collectorName("share", "activity"),
+			"Number of remote machines currently using a share",
+			[]string{"service"}, nil),
+
+		prometheus.NewDesc(
+			collectorName("share", "byremote"),
+			"Number of shares served for remote machine",
+			[]string{"machine"}, nil),
 	}
 	return col
 }

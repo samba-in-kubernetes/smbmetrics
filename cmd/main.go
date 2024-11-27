@@ -6,6 +6,7 @@ import (
 	"os"
 	goruntime "runtime"
 
+	"github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	"github.com/samba-in-kubernetes/smbmetrics/internal/metrics"
@@ -23,6 +24,11 @@ func init() {
 }
 
 func main() {
+	var port int
+	pflag.IntVar(&port, "port", metrics.DefaultMetricsPort,
+		"Prometheus metrics-exporter port number")
+	pflag.Parse()
+
 	log := zap.New(zap.UseDevMode(true))
 	log.Info("Initializing smbmetrics",
 		"ProgramName", os.Args[0],
@@ -48,7 +54,7 @@ func main() {
 	}
 	log.Info("Located smbstatus", "path", loc, "version", ver)
 
-	err = metrics.RunSmbMetricsExporter(log)
+	err = metrics.RunSmbMetricsExporter(log, port)
 	if err != nil {
 		os.Exit(1)
 	}

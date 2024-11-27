@@ -147,7 +147,7 @@ var (
 		}
 	  }
 	},
-	"locked_files": {
+	"open_files": {
 	  "/home/janger/testfolder/hallo": {
 		"service_path": "/home/janger/testfolder",
 		"filename": "hallo",
@@ -166,7 +166,7 @@ var (
 			  "unique_id": "10756714984493602300"
 			},
 			"uid": 1000,
-			"share_file_id": 2,
+			"share_file_id": "2",
 			"sharemode": {
 			  "hex": "0x00000003",
 			  "NONE": false,
@@ -267,7 +267,7 @@ var (
 		}
 	  }
 	},
-	"locked_files": {
+	"open_files": {
 	  "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee/a/y": {
 		"service_path": "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee",
 		"filename": "a/y",
@@ -286,7 +286,7 @@ var (
 			  "unique_id": "7364797719700910696"
 			},
 			"uid": 1000,
-			"share_file_id": 61,
+			"share_file_id": "61",
 			"sharemode": {
 			  "hex": "0x00000007",
 			  "NONE": false,
@@ -322,19 +322,12 @@ var (
 			},
 			"oplock": {
 			  "EXCLUSIVE": false,
-			  "BATCH": false,
+			  "BATCH": true,
 			  "LEVEL_II": false,
-			  "LEASE": true,
-			  "text": "LEASE(RWH)"
+			  "LEASE": false,
+			  "text": "BATCH"
 			},
-			"lease": {
-			  "lease_key": "ac1cf117-4ac6-b543-8bc8-597d795e8546",
-			  "hex": "0x00000007",
-			  "READ": true,
-			  "WRITE": true,
-			  "HANDLE": true,
-			  "text": "RWH"
-			},
+			"lease": {},
 			"connected_at": "2022-07-20T12:06:29+0000"
 		  }
 		}
@@ -357,7 +350,7 @@ var (
 			  "unique_id": "7364797719700910696"
 			},
 			"uid": 1000,
-			"share_file_id": 65,
+			"share_file_id": "65",
 			"sharemode": {
 			  "hex": "0x00000007",
 			  "NONE": false,
@@ -393,19 +386,12 @@ var (
 			},
 			"oplock": {
 			  "EXCLUSIVE": false,
-			  "BATCH": false,
+			  "BATCH": true,
 			  "LEVEL_II": false,
 			  "LEASE": true,
-			  "text": "LEASE(RWH)"
+			  "text": "BATCH"
 			},
-			"lease": {
-			  "lease_key": "a110aee8-2bfa-2349-b148-22a018a2e061",
-			  "hex": "0x00000007",
-			  "READ": true,
-			  "WRITE": true,
-			  "HANDLE": true,
-			  "text": "RWH"
-			},
+			"lease": {},
 			"connected_at": "2022-07-20T12:06:42+0000"
 		  }
 		}
@@ -414,7 +400,7 @@ var (
   }
   `
 
-	smbstatusLocksOutput = `
+	smbstatusOutput5 = `
   {
 	"timestamp": "2024-04-14T14:53:34.901974+0300",
 	"version": "4.21.0pre1-GIT-58a018fb7ad",
@@ -478,7 +464,6 @@ var (
 		  "LEASE": false,
 		  "text": "BATCH"
 		},
-		"lease": {},
 		"opened_at": "2024-04-14T14:53:15.569085+03:00"
 	      }
 	    }
@@ -535,13 +520,12 @@ var (
 		  "text": "RW"
 		},
 		"oplock": {
-		  "EXCLUSIVE": true,
-		  "BATCH": true,
-		  "LEVEL_II": false,
+		  "EXCLUSIVE": false,
+		  "BATCH": false,
+		  "LEVEL_II": true,
 		  "LEASE": false,
 		  "text": "BATCH"
 		},
-		"lease": {},
 		"opened_at": "2024-04-14T14:53:32.258325+03:00"
 	      }
 	    }
@@ -549,6 +533,411 @@ var (
 	}
       }
   `
+
+	smbstatusOutput6 = `
+{
+  "timestamp": "2024-07-04T13:04:45.910759+0300",
+  "version": "4.21.0pre1-GIT-a5c7776b2f9",
+  "smb_conf": "//etc/samba/smb.conf",
+  "sessions": {
+    "2211197710": {
+      "session_id": "2211197710",
+      "server_id": {
+        "pid": "34128",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "16540149349904229747"
+      },
+      "uid": 1111,
+      "gid": 1111,
+      "username": "testuser",
+      "groupname": "testuser",
+      "creation_time": "2024-07-04T12:44:14.413940+03:00",
+      "expiration_time": "30828-09-14T05:48:05.477581+03:00",
+      "auth_time": "2024-07-04T12:44:14.418769+03:00",
+      "remote_machine": "192.168.122.83",
+      "hostname": "ipv4:192.168.122.83:56892",
+      "session_dialect": "SMB2_02",
+      "client_guid": "00000000-0000-0000-0000-000000000000",
+      "encryption": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "channels": {
+        "1": {
+          "channel_id": "1",
+          "creation_time": "2024-07-04T12:44:14.413940+03:00",
+          "local_address": "ipv4:192.168.122.119:445",
+          "remote_address": "ipv4:192.168.122.83:56892"
+        }
+      }
+    },
+    "664362732": {
+      "session_id": "664362732",
+      "server_id": {
+        "pid": "34156",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "10342000937013985296"
+      },
+      "uid": 1111,
+      "gid": 1111,
+      "username": "testuser",
+      "groupname": "testuser",
+      "creation_time": "2024-07-04T12:48:20.117703+03:00",
+      "expiration_time": "30828-09-14T05:48:05.477581+03:00",
+      "auth_time": "2024-07-04T12:48:20.124245+03:00",
+      "remote_machine": "192.168.122.235",
+      "hostname": "ipv4:192.168.122.235:34092",
+      "session_dialect": "SMB2_02",
+      "client_guid": "00000000-0000-0000-0000-000000000000",
+      "encryption": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "channels": {
+        "1": {
+          "channel_id": "1",
+          "creation_time": "2024-07-04T12:48:20.117703+03:00",
+          "local_address": "ipv4:192.168.122.119:445",
+          "remote_address": "ipv4:192.168.122.235:34092"
+        }
+      }
+    }
+  },
+  "tcons": {
+    "2459296875": {
+      "service": "IPC$",
+      "server_id": {
+        "pid": "34156",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "10342000937013985296"
+      },
+      "tcon_id": "2459296875",
+      "session_id": "664362732",
+      "machine": "192.168.122.235",
+      "connected_at": "2024-07-04T12:48:20.129126+03:00",
+      "encryption": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "-",
+        "degree": "none"
+      }
+    },
+    "1357200611": {
+      "service": "smbshare",
+      "server_id": {
+        "pid": "34156",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "10342000937013985296"
+      },
+      "tcon_id": "1357200611",
+      "session_id": "664362732",
+      "machine": "192.168.122.235",
+      "connected_at": "2024-07-04T12:48:20.130103+03:00",
+      "encryption": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "-",
+        "degree": "none"
+      }
+    },
+    "2373869966": {
+      "service": "smbshare",
+      "server_id": {
+        "pid": "34128",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "16540149349904229747"
+      },
+      "tcon_id": "2373869966",
+      "session_id": "2211197710",
+      "machine": "192.168.122.83",
+      "connected_at": "2024-07-04T12:44:14.424733+03:00",
+      "encryption": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "-",
+        "degree": "none"
+      }
+    },
+    "2758374422": {
+      "service": "IPC$",
+      "server_id": {
+        "pid": "34128",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "16540149349904229747"
+      },
+      "tcon_id": "2758374422",
+      "session_id": "2211197710",
+      "machine": "192.168.122.83",
+      "connected_at": "2024-07-04T12:44:14.423739+03:00",
+      "encryption": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "-",
+        "degree": "none"
+      }
+    }
+  },
+  "open_files": {
+    "/A/b": {
+      "service_path": "/",
+      "filename": "A/b",
+      "fileid": {
+        "devid": -2,
+        "inode": 1099512325566,
+        "extid": 0
+      },
+      "num_pending_deletes": 0,
+      "opens": {
+        "34156/114": {
+          "server_id": {
+            "pid": "34156",
+            "task_id": "0",
+            "vnn": "4294967295",
+            "unique_id": "10342000937013985296"
+          },
+          "uid": 1111,
+          "share_file_id": "114",
+          "sharemode": {
+            "hex": "0x00000007",
+            "READ": true,
+            "WRITE": true,
+            "DELETE": true,
+            "text": "RWD"
+          },
+          "access_mask": {
+            "hex": "0x00120089",
+            "READ_DATA": true,
+            "WRITE_DATA": false,
+            "APPEND_DATA": false,
+            "READ_EA": true,
+            "WRITE_EA": false,
+            "EXECUTE": false,
+            "READ_ATTRIBUTES": true,
+            "WRITE_ATTRIBUTES": false,
+            "DELETE_CHILD": false,
+            "DELETE": false,
+            "READ_CONTROL": true,
+            "WRITE_DAC": false,
+            "SYNCHRONIZE": true,
+            "ACCESS_SYSTEM_SECURITY": false,
+            "text": "R"
+          },
+          "caching": {
+            "READ": true,
+            "WRITE": false,
+            "HANDLE": false,
+            "hex": "0x00000001",
+            "text": "R"
+          },
+          "oplock": {
+            "EXCLUSIVE": false,
+            "BATCH": false,
+            "LEVEL_II": false,
+            "LEASE": true,
+            "text": "LEASE"
+          },
+          "lease": {
+            "lease_key": "272e4282-36e6-11ef-8a34-309c2337f855",
+            "hex": "0x00000005",
+            "READ": true,
+            "WRITE": true,
+            "HANDLE": false,
+            "text": "LEASE(RW)"
+          },
+          "opened_at": "2024-07-04T13:02:41.967466+03:00"
+        },
+        "34128/309": {
+          "server_id": {
+            "pid": "34128",
+            "task_id": "0",
+            "vnn": "4294967295",
+            "unique_id": "16540149349904229747"
+          },
+          "uid": 1111,
+          "share_file_id": "309",
+          "sharemode": {
+            "hex": "0x00000007",
+            "READ": true,
+            "WRITE": true,
+            "DELETE": true,
+            "text": "RWD"
+          },
+          "access_mask": {
+            "hex": "0x0012019f",
+            "READ_DATA": true,
+            "WRITE_DATA": true,
+            "APPEND_DATA": true,
+            "READ_EA": true,
+            "WRITE_EA": true,
+            "EXECUTE": false,
+            "READ_ATTRIBUTES": true,
+            "WRITE_ATTRIBUTES": true,
+            "DELETE_CHILD": false,
+            "DELETE": false,
+            "READ_CONTROL": true,
+            "WRITE_DAC": false,
+            "SYNCHRONIZE": true,
+            "ACCESS_SYSTEM_SECURITY": false,
+            "text": "RW"
+          },
+          "caching": {
+            "READ": true,
+            "WRITE": false,
+            "HANDLE": false,
+            "hex": "0x00000001",
+            "text": "R"
+          },
+          "oplock": {
+            "EXCLUSIVE": false,
+            "BATCH": false,
+            "LEVEL_II": true,
+            "LEASE": false,
+            "text": "LEVEL_II"
+          },
+          "lease": {},
+          "opened_at": "2024-07-04T13:04:05.727421+03:00"
+        }
+      }
+    },
+    "/A/a": {
+      "service_path": "/",
+      "filename": "A/a",
+      "fileid": {
+        "devid": -2,
+        "inode": 1099512188451,
+        "extid": 0
+      },
+      "num_pending_deletes": 0,
+      "opens": {
+        "34156/110": {
+          "server_id": {
+            "pid": "34156",
+            "task_id": "0",
+            "vnn": "4294967295",
+            "unique_id": "10342000937013985296"
+          },
+          "uid": 1111,
+          "share_file_id": "110",
+          "sharemode": {
+            "hex": "0x00000007",
+            "READ": true,
+            "WRITE": true,
+            "DELETE": true,
+            "text": "RWD"
+          },
+          "access_mask": {
+            "hex": "0x0012019f",
+            "READ_DATA": true,
+            "WRITE_DATA": true,
+            "APPEND_DATA": true,
+            "READ_EA": true,
+            "WRITE_EA": true,
+            "EXECUTE": false,
+            "READ_ATTRIBUTES": true,
+            "WRITE_ATTRIBUTES": true,
+            "DELETE_CHILD": false,
+            "DELETE": false,
+            "READ_CONTROL": true,
+            "WRITE_DAC": false,
+            "SYNCHRONIZE": true,
+            "ACCESS_SYSTEM_SECURITY": false,
+            "text": "RW"
+          },
+          "caching": {
+            "READ": true,
+            "WRITE": false,
+            "HANDLE": false,
+            "hex": "0x00000001",
+            "text": "R"
+          },
+          "oplock": {
+            "EXCLUSIVE": false,
+            "BATCH": false,
+            "LEVEL_II": true,
+            "LEASE": false,
+            "text": "LEVEL_II"
+          },
+          "lease": {},
+          "opened_at": "2024-07-04T13:02:18.430418+03:00"
+        },
+        "34128/303": {
+          "server_id": {
+            "pid": "34128",
+            "task_id": "0",
+            "vnn": "4294967295",
+            "unique_id": "16540149349904229747"
+          },
+          "uid": 1111,
+          "share_file_id": "303",
+          "sharemode": {
+            "hex": "0x00000007",
+            "READ": true,
+            "WRITE": true,
+            "DELETE": true,
+            "text": "RWD"
+          },
+          "access_mask": {
+            "hex": "0x0012019f",
+            "READ_DATA": true,
+            "WRITE_DATA": true,
+            "APPEND_DATA": true,
+            "READ_EA": true,
+            "WRITE_EA": true,
+            "EXECUTE": false,
+            "READ_ATTRIBUTES": true,
+            "WRITE_ATTRIBUTES": true,
+            "DELETE_CHILD": false,
+            "DELETE": false,
+            "READ_CONTROL": true,
+            "WRITE_DAC": false,
+            "SYNCHRONIZE": true,
+            "ACCESS_SYSTEM_SECURITY": false,
+            "text": "RW"
+          },
+          "caching": {
+            "READ": true,
+            "WRITE": false,
+            "HANDLE": false,
+            "hex": "0x00000001",
+            "text": "R"
+          },
+          "oplock": {
+            "EXCLUSIVE": false,
+            "BATCH": false,
+            "LEVEL_II": true,
+            "LEASE": false,
+            "text": "LEVEL_II"
+          },
+          "lease": {},
+          "opened_at": "2024-07-04T13:02:04.739655+03:00"
+        }
+      }
+    }
+  }
+}
+`
 )
 
 //revive:enable line-length-limit
@@ -584,15 +973,15 @@ func TestParseSMBStatusAll(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.Sessions), 1)
 	assert.Equal(t, len(dat.TCons), 1)
-	assert.Equal(t, len(dat.LockedFiles), 1)
+	assert.Equal(t, len(dat.OpenFiles), 1)
 
 	dat2, err := parseSMBStatus(smbstatusOutput4)
 	assert.NoError(t, err)
-	assert.Equal(t, len(dat2.LockedFiles), 2)
+	assert.Equal(t, len(dat2.OpenFiles), 2)
 }
 
 func TestParseSMBStatusLocks(t *testing.T) {
-	locks, err := parseSMBStatusLockedFiles(smbstatusLocksOutput)
+	locks, err := parseSMBStatusLockedFiles(smbstatusOutput5)
 	assert.NoError(t, err)
 	assert.Equal(t, len(locks), 2)
 	lock1 := locks[0]
@@ -601,4 +990,49 @@ func TestParseSMBStatusLocks(t *testing.T) {
 	lock2 := locks[1]
 	assert.Equal(t, lock2.FileID.Inode, int64(52))
 	assert.Equal(t, lock2.NumPendingDeletes, 2)
+}
+
+func TestParseSMBStatusOpenFiles(t *testing.T) {
+	status, err := parseSMBStatus(smbstatusOutput6)
+	assert.NoError(t, err)
+	assert.Equal(t, len(status.OpenFiles), 2)
+	openFileAa := status.OpenFiles["/A/a"]
+	assert.Equal(t, len(openFileAa.Opens), 2)
+	for _, open := range openFileAa.Opens {
+		oplock := open.OpLock
+		lease := open.Lease
+		assert.Equal(t, oplock.Batch, false)
+		assert.Equal(t, oplock.LevelII, true)
+		assert.Equal(t, oplock.Text, "LEVEL_II")
+		assert.Equal(t, oplock.Exclusive, false)
+		assert.Equal(t, lease.Handle, false)
+		assert.Equal(t, lease.Read, false)
+		assert.Equal(t, lease.Write, false)
+		assert.Equal(t, lease.Text, "")
+	}
+	openFileAb := status.OpenFiles["/A/b"]
+	assert.Equal(t, len(openFileAb.Opens), 2)
+	for _, open := range openFileAb.Opens {
+		oplock := open.OpLock
+		lease := open.Lease
+		if oplock.Lease {
+			assert.Equal(t, oplock.Batch, false)
+			assert.Equal(t, oplock.LevelII, false)
+			assert.Equal(t, oplock.Text, "LEASE")
+			assert.Equal(t, oplock.Exclusive, false)
+			assert.Equal(t, lease.Handle, false)
+			assert.Equal(t, lease.Read, true)
+			assert.Equal(t, lease.Write, true)
+			assert.Equal(t, lease.Text, "LEASE(RW)")
+		} else {
+			assert.Equal(t, oplock.Batch, false)
+			assert.Equal(t, oplock.LevelII, true)
+			assert.Equal(t, oplock.Text, "LEVEL_II")
+			assert.Equal(t, oplock.Exclusive, false)
+			assert.Equal(t, lease.Handle, false)
+			assert.Equal(t, lease.Read, false)
+			assert.Equal(t, lease.Write, false)
+			assert.Equal(t, lease.Text, "")
+		}
+	}
 }

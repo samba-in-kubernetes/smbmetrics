@@ -27,4 +27,4 @@ FROM quay.io/samba.org/samba-server:v0.5
 COPY --from=builder /workspace/smbmetrics /bin/smbmetrics
 
 ENTRYPOINT ["/bin/smbmetrics"]
-EXPOSE 8080
+EXPOSE 9922
