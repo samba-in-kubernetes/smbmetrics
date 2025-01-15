@@ -46,7 +46,7 @@ _install_revive() {
 }
 
 _install_golangci_lint() {
-	_install_tool github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
+	_install_tool github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.2
 }
 
 _install_yq() {
@@ -54,7 +54,7 @@ _install_yq() {
 }
 
 _install_gosec() {
-	_install_tool github.com/securego/gosec/v2/cmd/gosec@v2.19.0
+	_install_tool github.com/securego/gosec/v2/cmd/gosec@v2.20.0
 }
 
 _install_gitlint() {
