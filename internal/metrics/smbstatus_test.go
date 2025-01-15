@@ -948,18 +948,16 @@ func TestParseSMBStatusTCons(t *testing.T) {
 	assert.Equal(t, len(dat.TCons), 2)
 
 	dat, err = parseSMBStatus(smbstatusOutput2)
-	assert.NoError(t, err)
 	assert.Equal(t, len(dat.TCons), 1)
-
-	shares, err := parseSMBStatusTreeCons(smbstatusOutput2)
 	assert.NoError(t, err)
-	assert.Equal(t, len(shares), 1)
-	share1 := shares[0]
-	assert.Equal(t, share1.Service, "share1")
-	assert.Equal(t, share1.ServerID.PID, "355")
-	assert.Equal(t, share1.Machine, "::1")
+	tcons := dat.ListTreeCons()
+	assert.Equal(t, len(tcons), 1)
+	tcon1 := tcons[0]
+	assert.Equal(t, tcon1.Service, "share1")
+	assert.Equal(t, tcon1.ServerID.PID, "355")
+	assert.Equal(t, tcon1.Machine, "::1")
 
-	sharesMap := makeSmbSharesMap(shares)
+	sharesMap := makeSmbSharesMap(tcons)
 	assert.Equal(t, len(sharesMap), 1)
 	for machine, share := range sharesMap {
 		sharesCount := len(share)
@@ -973,9 +971,8 @@ func TestParseSMBStatusAll(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat.Sessions), 1)
 	assert.Equal(t, len(dat.TCons), 1)
-	assert.Equal(t, len(dat.OpenFiles), 1)
 
-	dat2, err := parseSMBStatus(smbstatusOutput4)
+	dat2, err := parseSMBStatusLocks(smbstatusOutput4)
 	assert.NoError(t, err)
 	assert.Equal(t, len(dat2.OpenFiles), 2)
 }
@@ -993,7 +990,7 @@ func TestParseSMBStatusLocks(t *testing.T) {
 }
 
 func TestParseSMBStatusOpenFiles(t *testing.T) {
-	status, err := parseSMBStatus(smbstatusOutput6)
+	status, err := parseSMBStatusLocks(smbstatusOutput6)
 	assert.NoError(t, err)
 	assert.Equal(t, len(status.OpenFiles), 2)
 	openFileAa := status.OpenFiles["/A/a"]
