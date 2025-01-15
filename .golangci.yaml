@@ -6,11 +6,10 @@ linters:
   enable:
     - asciicheck
     # - deadcode
-    - depguard
     - dupl
     - errcheck
     - exhaustive
-    - exportloopref
+    - copyloopvar
     - funlen
     # - gci
     - goconst
@@ -24,7 +23,6 @@ linters:
     # - ineffassign
     # - ifshort
     - lll
-    - megacheck
     - misspell
     # - nlreturn
     # - nolintlint
@@ -37,20 +35,16 @@ linters:
     - unconvert
     # - unparam
     - unused
-    # - varcheck
     - whitespace
 linters-settings:
-  depguard:
-    rules:
-      main:
-        list-mode: lax
-        # using explicit 'deny' entry only to suppress linter warnings.
-        deny:
-          - pkg: "github.com/sirupsen/logrus"
-            desc: not allowed
   funlen:
     lines: 188
     statements: 60
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment
+      - shadow
   lll:
     line-length: 98
   revive:
