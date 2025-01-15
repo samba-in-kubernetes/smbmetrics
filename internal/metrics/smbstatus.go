@@ -138,12 +138,11 @@ type SMBStatusOpenLease struct {
 
 // SMBStatus represents output of 'smbstatus --json'
 type SMBStatus struct {
-	Timestamp string                       `json:"timestamp"`
-	Version   string                       `json:"version"`
-	SmbConf   string                       `json:"smb_conf"`
-	Sessions  map[string]SMBStatusSession  `json:"sessions"`
-	TCons     map[string]SMBStatusTreeCon  `json:"tcons"`
-	OpenFiles map[string]SMBStatusOpenFile `json:"open_files"`
+	Timestamp string                      `json:"timestamp"`
+	Version   string                      `json:"version"`
+	SmbConf   string                      `json:"smb_conf"`
+	Sessions  map[string]SMBStatusSession `json:"sessions"`
+	TCons     map[string]SMBStatusTreeCon `json:"tcons"`
 }
 
 // SMBStatusLocks represents output of 'smbstatus -L --json'
@@ -175,15 +174,6 @@ func LocateSMBStatus() (string, error) {
 	return "", errors.New("failed to locate smbstatus")
 }
 
-// RunSMBStatus executes 'smbstatus --json' on host machine
-func RunSMBStatus() (*SMBStatus, error) {
-	dat, err := executeSMBStatusCommand("--json")
-	if err != nil {
-		return &SMBStatus{}, err
-	}
-	return parseSMBStatus(dat)
-}
-
 // RunSMBStatusVersion executes 'smbstatus --version' on host container
 func RunSMBStatusVersion() (string, error) {
 	ver, err := executeSMBStatusCommand("--version")
@@ -193,30 +183,27 @@ func RunSMBStatusVersion() (string, error) {
 	return ver, nil
 }
 
-// RunSMBStatusShares executes 'smbstatus --shares --json' on host
-func RunSMBStatusShares() ([]SMBStatusTreeCon, error) {
-	dat, err := executeSMBStatusCommand("--shares --json")
+// RunSMBStatusShares executes 'smbstatus --processes --json' on host
+func RunSMBStatusProcesses() (*SMBStatus, error) {
+	dat, err := executeSMBStatusCommand("--processes", "--json")
 	if err != nil {
-		return []SMBStatusTreeCon{}, err
+		return &SMBStatus{}, err
 	}
-	return parseSMBStatusTreeCons(dat)
+	return parseSMBStatus(dat)
 }
 
-func parseSMBStatusTreeCons(dat string) ([]SMBStatusTreeCon, error) {
-	tcons := []SMBStatusTreeCon{}
-	res, err := parseSMBStatus(dat)
+// RunSMBStatusShares executes 'smbstatus --shares --json' on host
+func RunSMBStatusShares() (*SMBStatus, error) {
+	dat, err := executeSMBStatusCommand("--shares", "--json")
 	if err != nil {
-		return tcons, err
+		return &SMBStatus{}, err
 	}
-	for _, share := range res.TCons {
-		tcons = append(tcons, share)
-	}
-	return tcons, nil
+	return parseSMBStatus(dat)
 }
 
 // RunSMBStatusLocks executes 'smbstatus --locks --json' on host
 func RunSMBStatusLocks() ([]SMBStatusOpenFile, error) {
-	dat, err := executeSMBStatusCommand("--locks --json")
+	dat, err := executeSMBStatusCommand("--locks", "--json")
 	if err != nil {
 		return []SMBStatusOpenFile{}, err
 	}
@@ -238,11 +225,11 @@ func parseSMBStatusLockedFiles(dat string) ([]SMBStatusOpenFile, error) {
 // SMBStatusSharesByMachine converts the output of RunSMBStatusShares into map
 // indexed by machine's host
 func SMBStatusSharesByMachine() (map[string][]SMBStatusTreeCon, error) {
-	tcons, err := RunSMBStatusShares()
+	smbstat, err := RunSMBStatusShares()
 	if err != nil {
 		return map[string][]SMBStatusTreeCon{}, err
 	}
-	return makeSmbSharesMap(tcons), nil
+	return makeSmbSharesMap(smbstat.ListTreeCons()), nil
 }
 
 func makeSmbSharesMap(tcons []SMBStatusTreeCon) map[string][]SMBStatusTreeCon {
@@ -295,7 +282,24 @@ func NewSMBStatus() *SMBStatus {
 		SmbConf:   "",
 		Sessions:  map[string]SMBStatusSession{},
 		TCons:     map[string]SMBStatusTreeCon{},
-		OpenFiles: map[string]SMBStatusOpenFile{},
 	}
 	return &smbStatus
+}
+
+// ListSessions returns a slice for mapped sessions
+func (smbstat *SMBStatus) ListSessions() []SMBStatusSession {
+	sessions := []SMBStatusSession{}
+	for _, session := range smbstat.Sessions {
+		sessions = append(sessions, session)
+	}
+	return sessions
+}
+
+// ListTreeCons returns a slice for mapped tree-connection
+func (smbstat *SMBStatus) ListTreeCons() []SMBStatusTreeCon {
+	tcons := []SMBStatusTreeCon{}
+	for _, share := range smbstat.TCons {
+		tcons = append(tcons, share)
+	}
+	return tcons
 }
