@@ -32,8 +32,6 @@ $ curl --request GET "http://localhost:9922/metrics"
 | `smb_sessions_total`      | Number of active SMB sessions                    |
 | `smb_tcon_total`          | Number of active SMB tree-connections            |
 | `smb_users_total`         | Number of connected users                        |
-| `smb_openfiles_total`     | Number of currently open files                   |
-| `smb_openfiles_access_rw` | Open files with `"RW"` access-mask set           |
 | `smb_share_activity`      | Number of remote machines using each share       |
 | `smb_share_byremote`      | Number of shares used by each remote machine     |
 
