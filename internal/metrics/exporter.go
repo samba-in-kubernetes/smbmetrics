@@ -65,11 +65,10 @@ func (sme *smbMetricsExporter) serve() error {
 
 // RunSmbMetricsExporter executes an HTTP server and exports SMB metrics to
 // Prometheus.
-func RunSmbMetricsExporter(log logr.Logger, port int) error {
+func RunSmbMetricsExporter(log logr.Logger, port int, profile bool) error {
 	if port <= 0 {
 		port = DefaultMetricsPort
 	}
-	profile := false
 	sme := newSmbMetricsExporter(log, port, profile)
 	err := sme.init()
 	if err != nil {
