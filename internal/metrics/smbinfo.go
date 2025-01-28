@@ -140,3 +140,30 @@ func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
 func isInternalServiceID(serviceID string) bool {
 	return serviceID == "IPC$"
 }
+
+// SMBProfileInfo provides a bridge layer between raw smbstatus profile info and
+// exported metric counters.
+type SMBProfileInfo struct {
+	profileStatus *SMBProfile
+}
+
+func NewSMBProfileInfo() *SMBProfileInfo {
+	return &SMBProfileInfo{
+		profileStatus: NewSMBProfile(),
+	}
+}
+
+func NewUpdatedSMBProfileInfo() (*SMBProfileInfo, error) {
+	smbProfileInfo := NewSMBProfileInfo()
+	err := smbProfileInfo.Update()
+	return smbProfileInfo, err
+}
+
+func (smbProfileInfo *SMBProfileInfo) Update() error {
+	profiuleStatus, err := RunSMBStatusProfile()
+	if err != nil {
+		return err
+	}
+	smbProfileInfo.profileStatus = profiuleStatus
+	return nil
+}
