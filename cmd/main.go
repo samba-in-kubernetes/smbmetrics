@@ -27,6 +27,9 @@ func main() {
 	var port int
 	pflag.IntVar(&port, "port", metrics.DefaultMetricsPort,
 		"Prometheus metrics-exporter port number")
+	var profile bool
+	pflag.BoolVar(&profile, "profile", false,
+		"Run with collect profile information enabled")
 	pflag.Parse()
 
 	log := zap.New(zap.UseDevMode(true))
@@ -54,7 +57,7 @@ func main() {
 	}
 	log.Info("Located smbstatus", "path", loc, "version", ver)
 
-	err = metrics.RunSmbMetricsExporter(log, port)
+	err = metrics.RunSmbMetricsExporter(log, port, profile)
 	if err != nil {
 		os.Exit(1)
 	}

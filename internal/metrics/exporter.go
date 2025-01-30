@@ -20,18 +20,20 @@ var (
 )
 
 type smbMetricsExporter struct {
-	log  logr.Logger
-	reg  *prometheus.Registry
-	mux  *http.ServeMux
-	port int
+	log     logr.Logger
+	reg     *prometheus.Registry
+	mux     *http.ServeMux
+	port    int
+	profile bool
 }
 
-func newSmbMetricsExporter(log logr.Logger, port int) *smbMetricsExporter {
+func newSmbMetricsExporter(log logr.Logger, port int, profile bool) *smbMetricsExporter {
 	return &smbMetricsExporter{
-		log:  log,
-		reg:  prometheus.NewRegistry(),
-		mux:  http.NewServeMux(),
-		port: port,
+		log:     log,
+		reg:     prometheus.NewRegistry(),
+		mux:     http.NewServeMux(),
+		port:    port,
+		profile: profile,
 	}
 }
 
@@ -63,11 +65,11 @@ func (sme *smbMetricsExporter) serve() error {
 
 // RunSmbMetricsExporter executes an HTTP server and exports SMB metrics to
 // Prometheus.
-func RunSmbMetricsExporter(log logr.Logger, port int) error {
+func RunSmbMetricsExporter(log logr.Logger, port int, profile bool) error {
 	if port <= 0 {
 		port = DefaultMetricsPort
 	}
-	sme := newSmbMetricsExporter(log, port)
+	sme := newSmbMetricsExporter(log, port, profile)
 	err := sme.init()
 	if err != nil {
 		return err
