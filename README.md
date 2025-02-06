@@ -19,9 +19,9 @@ When running (by privileged user) along-side active SMB server, `smbmetrics`
 exports a set of gauge metrics over HTTP via port `9922`. Most metrics become
 visible only when active SMB connections exists. When Samba is compiled and
 run with profile-information enabled (`smb.conf` global section has
-`smbd profiling level = on`), you may run `smbmetrics --profile` to export also
-various profile stats as Prometheus metrics. Execute the folowing `curl`
-command on the same machine where you run `smbmetrics` instance:
+`smbd profiling level = on`), `smbmetrics` will also export various profile
+stats as Prometheus metrics. Execute the following `curl` command on the same
+machine where you run `smbmetrics` instance:
 
 ```console
 $ curl --request GET "http://localhost:9922/metrics"
