@@ -151,70 +151,75 @@ type smbProfileCollector struct {
 	smbCollector
 }
 
+//nolint:funlen
 func (col *smbProfileCollector) Collect(ch chan<- prometheus.Metric) {
-	if col.sme.profile {
-		smbProfileInfo, err := NewUpdatedSMBProfileInfo()
-		if err == nil {
-			smb2Calls := smbProfileInfo.profileStatus.SMB2Calls
-			ch <- col.smb2RequestMetric(&smb2Calls.NegProt, "negprot")
-			ch <- col.smb2RequestMetric(&smb2Calls.SessSetup, "sesssetup")
-			ch <- col.smb2RequestMetric(&smb2Calls.LogOff, "logoff")
-			ch <- col.smb2RequestMetric(&smb2Calls.Tcon, "tcon")
-			ch <- col.smb2RequestMetric(&smb2Calls.Tdis, "tdis")
-			ch <- col.smb2RequestMetric(&smb2Calls.Create, "create")
-			ch <- col.smb2RequestMetric(&smb2Calls.Close, "close")
-			ch <- col.smb2RequestMetric(&smb2Calls.Flush, "flush")
-			ch <- col.smb2RequestMetric(&smb2Calls.Read, "read")
-			ch <- col.smb2RequestMetric(&smb2Calls.Write, "write")
-			ch <- col.smb2RequestMetric(&smb2Calls.Lock, "lock")
-			ch <- col.smb2RequestMetric(&smb2Calls.Ioctl, "ioctl")
-			ch <- col.smb2RequestMetric(&smb2Calls.Cancel, "cancel")
-			ch <- col.smb2RequestMetric(&smb2Calls.KeepAlive, "keepalive")
-			ch <- col.smb2RequestMetric(&smb2Calls.Find, "find")
-			ch <- col.smb2RequestMetric(&smb2Calls.Notify, "notify")
-			ch <- col.smb2RequestMetric(&smb2Calls.GetInfo, "getinfo")
-			ch <- col.smb2RequestMetric(&smb2Calls.SetInfo, "setinfo")
-			ch <- col.smb2RequestMetric(&smb2Calls.Break, "break")
-
-			sysCalls := smbProfileInfo.profileStatus.SystemCalls
-			ch <- col.vfsIORequestMetric(&sysCalls.PRead, "pread")
-			ch <- col.vfsIORequestMetric(&sysCalls.AsysPRead, "asys_pread")
-			ch <- col.vfsIORequestMetric(&sysCalls.PWrite, "pwrite")
-			ch <- col.vfsIORequestMetric(&sysCalls.AsysPWrite, "asys_pwrite")
-			ch <- col.vfsIORequestMetric(&sysCalls.AsysFSync, "asys_fsync")
-
-			ch <- col.vfsRequestMetric(&sysCalls.Opendir, "opendir")
-			ch <- col.vfsRequestMetric(&sysCalls.FDOpendir, "fdopendir")
-			ch <- col.vfsRequestMetric(&sysCalls.Readdir, "readdir")
-			ch <- col.vfsRequestMetric(&sysCalls.Rewinddir, "rewinddir")
-			ch <- col.vfsRequestMetric(&sysCalls.Mkdirat, "mkdirat")
-			ch <- col.vfsRequestMetric(&sysCalls.Closedir, "closedir")
-			ch <- col.vfsRequestMetric(&sysCalls.Open, "open")
-			ch <- col.vfsRequestMetric(&sysCalls.OpenAt, "openat")
-			ch <- col.vfsRequestMetric(&sysCalls.CreateFile, "createfile")
-			ch <- col.vfsRequestMetric(&sysCalls.Close, "close")
-			ch <- col.vfsRequestMetric(&sysCalls.Lseek, "lseek")
-			ch <- col.vfsRequestMetric(&sysCalls.RenameAt, "renameat")
-			ch <- col.vfsRequestMetric(&sysCalls.Stat, "stat")
-			ch <- col.vfsRequestMetric(&sysCalls.FStat, "fstat")
-			ch <- col.vfsRequestMetric(&sysCalls.LStat, "lstat")
-			ch <- col.vfsRequestMetric(&sysCalls.FStatAt, "fstatat")
-			ch <- col.vfsRequestMetric(&sysCalls.UnlinkAt, "unlinkat")
-			ch <- col.vfsRequestMetric(&sysCalls.Chmod, "chmod")
-			ch <- col.vfsRequestMetric(&sysCalls.FChmod, "fchmod")
-			ch <- col.vfsRequestMetric(&sysCalls.FChown, "fchown")
-			ch <- col.vfsRequestMetric(&sysCalls.LChown, "lchown")
-			ch <- col.vfsRequestMetric(&sysCalls.Chdir, "chdir")
-			ch <- col.vfsRequestMetric(&sysCalls.GetWD, "getwd")
-			ch <- col.vfsRequestMetric(&sysCalls.Fntimes, "fntimes")
-			ch <- col.vfsRequestMetric(&sysCalls.FTruncate, "ftruncate")
-			ch <- col.vfsRequestMetric(&sysCalls.FAllocate, "fallocate")
-			ch <- col.vfsRequestMetric(&sysCalls.ReadLinkAt, "readlinkat")
-			ch <- col.vfsRequestMetric(&sysCalls.SymLinkAt, "symlinkat")
-			ch <- col.vfsRequestMetric(&sysCalls.LinkAt, "linkat")
-			ch <- col.vfsRequestMetric(&sysCalls.MknodAt, "mknodat")
-			ch <- col.vfsRequestMetric(&sysCalls.RealPath, "realpath")
-		}
+	if !col.sme.profile {
+		return
+	}
+	smbProfileInfo, err := NewUpdatedSMBProfileInfo()
+	if err != nil {
+		return
+	}
+	smb2Calls := smbProfileInfo.profileStatus.SMB2Calls
+	if smb2Calls != nil {
+		ch <- col.smb2RequestMetric(&smb2Calls.NegProt, "negprot")
+		ch <- col.smb2RequestMetric(&smb2Calls.SessSetup, "sesssetup")
+		ch <- col.smb2RequestMetric(&smb2Calls.LogOff, "logoff")
+		ch <- col.smb2RequestMetric(&smb2Calls.Tcon, "tcon")
+		ch <- col.smb2RequestMetric(&smb2Calls.Tdis, "tdis")
+		ch <- col.smb2RequestMetric(&smb2Calls.Create, "create")
+		ch <- col.smb2RequestMetric(&smb2Calls.Close, "close")
+		ch <- col.smb2RequestMetric(&smb2Calls.Flush, "flush")
+		ch <- col.smb2RequestMetric(&smb2Calls.Read, "read")
+		ch <- col.smb2RequestMetric(&smb2Calls.Write, "write")
+		ch <- col.smb2RequestMetric(&smb2Calls.Lock, "lock")
+		ch <- col.smb2RequestMetric(&smb2Calls.Ioctl, "ioctl")
+		ch <- col.smb2RequestMetric(&smb2Calls.Cancel, "cancel")
+		ch <- col.smb2RequestMetric(&smb2Calls.KeepAlive, "keepalive")
+		ch <- col.smb2RequestMetric(&smb2Calls.Find, "find")
+		ch <- col.smb2RequestMetric(&smb2Calls.Notify, "notify")
+		ch <- col.smb2RequestMetric(&smb2Calls.GetInfo, "getinfo")
+		ch <- col.smb2RequestMetric(&smb2Calls.SetInfo, "setinfo")
+		ch <- col.smb2RequestMetric(&smb2Calls.Break, "break")
+	}
+	sysCalls := smbProfileInfo.profileStatus.SystemCalls
+	if sysCalls != nil {
+		ch <- col.vfsIORequestMetric(&sysCalls.PRead, "pread")
+		ch <- col.vfsIORequestMetric(&sysCalls.AsysPRead, "asys_pread")
+		ch <- col.vfsIORequestMetric(&sysCalls.PWrite, "pwrite")
+		ch <- col.vfsIORequestMetric(&sysCalls.AsysPWrite, "asys_pwrite")
+		ch <- col.vfsIORequestMetric(&sysCalls.AsysFSync, "asys_fsync")
+		ch <- col.vfsRequestMetric(&sysCalls.Opendir, "opendir")
+		ch <- col.vfsRequestMetric(&sysCalls.FDOpendir, "fdopendir")
+		ch <- col.vfsRequestMetric(&sysCalls.Readdir, "readdir")
+		ch <- col.vfsRequestMetric(&sysCalls.Rewinddir, "rewinddir")
+		ch <- col.vfsRequestMetric(&sysCalls.Mkdirat, "mkdirat")
+		ch <- col.vfsRequestMetric(&sysCalls.Closedir, "closedir")
+		ch <- col.vfsRequestMetric(&sysCalls.Open, "open")
+		ch <- col.vfsRequestMetric(&sysCalls.OpenAt, "openat")
+		ch <- col.vfsRequestMetric(&sysCalls.CreateFile, "createfile")
+		ch <- col.vfsRequestMetric(&sysCalls.Close, "close")
+		ch <- col.vfsRequestMetric(&sysCalls.Lseek, "lseek")
+		ch <- col.vfsRequestMetric(&sysCalls.RenameAt, "renameat")
+		ch <- col.vfsRequestMetric(&sysCalls.Stat, "stat")
+		ch <- col.vfsRequestMetric(&sysCalls.FStat, "fstat")
+		ch <- col.vfsRequestMetric(&sysCalls.LStat, "lstat")
+		ch <- col.vfsRequestMetric(&sysCalls.FStatAt, "fstatat")
+		ch <- col.vfsRequestMetric(&sysCalls.UnlinkAt, "unlinkat")
+		ch <- col.vfsRequestMetric(&sysCalls.Chmod, "chmod")
+		ch <- col.vfsRequestMetric(&sysCalls.FChmod, "fchmod")
+		ch <- col.vfsRequestMetric(&sysCalls.FChown, "fchown")
+		ch <- col.vfsRequestMetric(&sysCalls.LChown, "lchown")
+		ch <- col.vfsRequestMetric(&sysCalls.Chdir, "chdir")
+		ch <- col.vfsRequestMetric(&sysCalls.GetWD, "getwd")
+		ch <- col.vfsRequestMetric(&sysCalls.Fntimes, "fntimes")
+		ch <- col.vfsRequestMetric(&sysCalls.FTruncate, "ftruncate")
+		ch <- col.vfsRequestMetric(&sysCalls.FAllocate, "fallocate")
+		ch <- col.vfsRequestMetric(&sysCalls.ReadLinkAt, "readlinkat")
+		ch <- col.vfsRequestMetric(&sysCalls.SymLinkAt, "symlinkat")
+		ch <- col.vfsRequestMetric(&sysCalls.LinkAt, "linkat")
+		ch <- col.vfsRequestMetric(&sysCalls.MknodAt, "mknodat")
+		ch <- col.vfsRequestMetric(&sysCalls.RealPath, "realpath")
 	}
 }
 
