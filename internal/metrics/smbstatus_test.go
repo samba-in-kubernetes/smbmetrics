@@ -1772,6 +1772,13 @@ var (
    }
 }
 `
+
+	smbstatusProfileOutput8 = `
+{
+  "timestamp":"2024-12-23T12:38:58.644260+0200",
+  "version":"4.22.0pre1-GIT-bc45829f56c",
+  "smb_conf":"//etc/samba/smb.conf"
+}`
 )
 
 //revive:enable line-length-limit
@@ -1879,4 +1886,12 @@ func TestParseSMBStatusProfile(t *testing.T) {
 	assert.Equal(t, profile.SystemCalls.AsysFSync.Count, 47)
 	assert.Equal(t, profile.SMB2Calls.Read.Outbytes, 10486240)
 	assert.Equal(t, profile.SMB2Calls.Write.Inbytes, 90180784)
+}
+
+func TestParseSMBStatusProfileNoData(t *testing.T) {
+	profile, err := parseSMBProfile(smbstatusProfileOutput8)
+	assert.NoError(t, err)
+	assert.Nil(t, profile.SmbdLoop)
+	assert.Nil(t, profile.SystemCalls)
+	assert.Nil(t, profile.SMB2Calls)
 }

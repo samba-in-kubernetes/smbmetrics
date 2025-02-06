@@ -259,12 +259,12 @@ type SMBProfileSMB2Calls struct {
 
 // SMBProfile represents (a subset of the) output of 'smbstatus --profile'
 type SMBProfile struct {
-	Timestamp   string              `json:"timestamp"`
-	Version     string              `json:"version"`
-	SmbConf     string              `json:"smb_conf"`
-	SmbdLoop    SMBProfileLoop      `json:"SMBD loop"`
-	SystemCalls SMBProfileSyscalls  `json:"System Calls"`
-	SMB2Calls   SMBProfileSMB2Calls `json:"SMB2 Calls"`
+	Timestamp   string               `json:"timestamp"`
+	Version     string               `json:"version"`
+	SmbConf     string               `json:"smb_conf"`
+	SmbdLoop    *SMBProfileLoop      `json:"SMBD loop"`
+	SystemCalls *SMBProfileSyscalls  `json:"System Calls"`
+	SMB2Calls   *SMBProfileSMB2Calls `json:"SMB2 Calls"`
 }
 
 // LocateSMBStatus finds the local executable of 'smbstatus' on host.
