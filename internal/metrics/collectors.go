@@ -86,7 +86,7 @@ type smbStatusCollector struct {
 }
 
 func (col *smbStatusCollector) Collect(ch chan<- prometheus.Metric) {
-	smbInfo, err := NewUpdatedSMBInfo()
+	smbInfo, err := NewUpdatedSMBInfo(col.sme.log)
 	if err != nil {
 		return
 	}
@@ -156,7 +156,7 @@ func (col *smbProfileCollector) Collect(ch chan<- prometheus.Metric) {
 	if !col.sme.profile {
 		return
 	}
-	smbProfileInfo, err := NewUpdatedSMBProfileInfo()
+	smbProfileInfo, err := NewUpdatedSMBProfileInfo(col.sme.log)
 	if err != nil {
 		return
 	}

@@ -2,23 +2,29 @@
 
 package metrics
 
+import (
+	"github.com/go-logr/logr"
+)
+
 // SMBInfo provides a bridge layer between raw smbstatus info and exported
 // metric counters. It also implements the more complex logic which requires in
 // memory re-mapping of the low-level information (e.g., stats by machine/user).
 type SMBInfo struct {
 	tconsStatus    *SMBStatus
 	sessionsStatus *SMBStatus
+	log            logr.Logger
 }
 
-func NewSMBInfo() *SMBInfo {
+func NewSMBInfo(log logr.Logger) *SMBInfo {
 	return &SMBInfo{
 		tconsStatus:    NewSMBStatus(),
 		sessionsStatus: NewSMBStatus(),
+		log:            log,
 	}
 }
 
-func NewUpdatedSMBInfo() (*SMBInfo, error) {
-	smbinfo := NewSMBInfo()
+func NewUpdatedSMBInfo(log logr.Logger) (*SMBInfo, error) {
+	smbinfo := NewSMBInfo(log)
 	err := smbinfo.Update()
 	return smbinfo, err
 }
@@ -26,10 +32,12 @@ func NewUpdatedSMBInfo() (*SMBInfo, error) {
 func (smbinfo *SMBInfo) Update() error {
 	tconsStatus, err := RunSMBStatusShares()
 	if err != nil {
+		smbinfo.log.Error(err, "smbsstatus --shares failed")
 		return err
 	}
 	sessionsStatus, err := RunSMBStatusProcesses()
 	if err != nil {
+		smbinfo.log.Error(err, "smbsstatus --processes failed")
 		return err
 	}
 	smbinfo.tconsStatus = tconsStatus
@@ -145,16 +153,18 @@ func isInternalServiceID(serviceID string) bool {
 // exported metric counters.
 type SMBProfileInfo struct {
 	profileStatus *SMBProfile
+	log           logr.Logger
 }
 
-func NewSMBProfileInfo() *SMBProfileInfo {
+func NewSMBProfileInfo(log logr.Logger) *SMBProfileInfo {
 	return &SMBProfileInfo{
 		profileStatus: NewSMBProfile(),
+		log:           log,
 	}
 }
 
-func NewUpdatedSMBProfileInfo() (*SMBProfileInfo, error) {
-	smbProfileInfo := NewSMBProfileInfo()
+func NewUpdatedSMBProfileInfo(log logr.Logger) (*SMBProfileInfo, error) {
+	smbProfileInfo := NewSMBProfileInfo(log)
 	err := smbProfileInfo.Update()
 	return smbProfileInfo, err
 }
@@ -162,6 +172,7 @@ func NewUpdatedSMBProfileInfo() (*SMBProfileInfo, error) {
 func (smbProfileInfo *SMBProfileInfo) Update() error {
 	profiuleStatus, err := RunSMBStatusProfile()
 	if err != nil {
+		smbProfileInfo.log.Error(err, "smbsstatus --profile failed")
 		return err
 	}
 	smbProfileInfo.profileStatus = profiuleStatus
