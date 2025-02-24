@@ -3,8 +3,6 @@
 package metrics
 
 import (
-	"strconv"
-
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -151,7 +149,6 @@ type smbProfileCollector struct {
 	smbCollector
 }
 
-//nolint:funlen
 func (col *smbProfileCollector) Collect(ch chan<- prometheus.Metric) {
 	if !col.sme.profile {
 		return
@@ -162,99 +159,176 @@ func (col *smbProfileCollector) Collect(ch chan<- prometheus.Metric) {
 	}
 	smb2Calls := smbProfileInfo.profileStatus.SMB2Calls
 	if smb2Calls != nil {
-		ch <- col.smb2RequestMetric(&smb2Calls.NegProt, "negprot")
-		ch <- col.smb2RequestMetric(&smb2Calls.SessSetup, "sesssetup")
-		ch <- col.smb2RequestMetric(&smb2Calls.LogOff, "logoff")
-		ch <- col.smb2RequestMetric(&smb2Calls.Tcon, "tcon")
-		ch <- col.smb2RequestMetric(&smb2Calls.Tdis, "tdis")
-		ch <- col.smb2RequestMetric(&smb2Calls.Create, "create")
-		ch <- col.smb2RequestMetric(&smb2Calls.Close, "close")
-		ch <- col.smb2RequestMetric(&smb2Calls.Flush, "flush")
-		ch <- col.smb2RequestMetric(&smb2Calls.Read, "read")
-		ch <- col.smb2RequestMetric(&smb2Calls.Write, "write")
-		ch <- col.smb2RequestMetric(&smb2Calls.Lock, "lock")
-		ch <- col.smb2RequestMetric(&smb2Calls.Ioctl, "ioctl")
-		ch <- col.smb2RequestMetric(&smb2Calls.Cancel, "cancel")
-		ch <- col.smb2RequestMetric(&smb2Calls.KeepAlive, "keepalive")
-		ch <- col.smb2RequestMetric(&smb2Calls.Find, "find")
-		ch <- col.smb2RequestMetric(&smb2Calls.Notify, "notify")
-		ch <- col.smb2RequestMetric(&smb2Calls.GetInfo, "getinfo")
-		ch <- col.smb2RequestMetric(&smb2Calls.SetInfo, "setinfo")
-		ch <- col.smb2RequestMetric(&smb2Calls.Break, "break")
+		col.collectSMB2CallsMetrics(ch, smb2Calls)
 	}
 	sysCalls := smbProfileInfo.profileStatus.SystemCalls
 	if sysCalls != nil {
-		ch <- col.vfsIORequestMetric(&sysCalls.PRead, "pread")
-		ch <- col.vfsIORequestMetric(&sysCalls.AsysPRead, "asys_pread")
-		ch <- col.vfsIORequestMetric(&sysCalls.PWrite, "pwrite")
-		ch <- col.vfsIORequestMetric(&sysCalls.AsysPWrite, "asys_pwrite")
-		ch <- col.vfsIORequestMetric(&sysCalls.AsysFSync, "asys_fsync")
-		ch <- col.vfsRequestMetric(&sysCalls.Opendir, "opendir")
-		ch <- col.vfsRequestMetric(&sysCalls.FDOpendir, "fdopendir")
-		ch <- col.vfsRequestMetric(&sysCalls.Readdir, "readdir")
-		ch <- col.vfsRequestMetric(&sysCalls.Rewinddir, "rewinddir")
-		ch <- col.vfsRequestMetric(&sysCalls.Mkdirat, "mkdirat")
-		ch <- col.vfsRequestMetric(&sysCalls.Closedir, "closedir")
-		ch <- col.vfsRequestMetric(&sysCalls.Open, "open")
-		ch <- col.vfsRequestMetric(&sysCalls.OpenAt, "openat")
-		ch <- col.vfsRequestMetric(&sysCalls.CreateFile, "createfile")
-		ch <- col.vfsRequestMetric(&sysCalls.Close, "close")
-		ch <- col.vfsRequestMetric(&sysCalls.Lseek, "lseek")
-		ch <- col.vfsRequestMetric(&sysCalls.RenameAt, "renameat")
-		ch <- col.vfsRequestMetric(&sysCalls.Stat, "stat")
-		ch <- col.vfsRequestMetric(&sysCalls.FStat, "fstat")
-		ch <- col.vfsRequestMetric(&sysCalls.LStat, "lstat")
-		ch <- col.vfsRequestMetric(&sysCalls.FStatAt, "fstatat")
-		ch <- col.vfsRequestMetric(&sysCalls.UnlinkAt, "unlinkat")
-		ch <- col.vfsRequestMetric(&sysCalls.Chmod, "chmod")
-		ch <- col.vfsRequestMetric(&sysCalls.FChmod, "fchmod")
-		ch <- col.vfsRequestMetric(&sysCalls.FChown, "fchown")
-		ch <- col.vfsRequestMetric(&sysCalls.LChown, "lchown")
-		ch <- col.vfsRequestMetric(&sysCalls.Chdir, "chdir")
-		ch <- col.vfsRequestMetric(&sysCalls.GetWD, "getwd")
-		ch <- col.vfsRequestMetric(&sysCalls.Fntimes, "fntimes")
-		ch <- col.vfsRequestMetric(&sysCalls.FTruncate, "ftruncate")
-		ch <- col.vfsRequestMetric(&sysCalls.FAllocate, "fallocate")
-		ch <- col.vfsRequestMetric(&sysCalls.ReadLinkAt, "readlinkat")
-		ch <- col.vfsRequestMetric(&sysCalls.SymLinkAt, "symlinkat")
-		ch <- col.vfsRequestMetric(&sysCalls.LinkAt, "linkat")
-		ch <- col.vfsRequestMetric(&sysCalls.MknodAt, "mknodat")
-		ch <- col.vfsRequestMetric(&sysCalls.RealPath, "realpath")
+		col.collectSysCallsMetrics(ch, sysCalls)
 	}
 }
 
-func (col *smbProfileCollector) smb2RequestMetric(pce *SMBProfileCallEntry,
-	operation string) prometheus.Metric {
+func (col *smbProfileCollector) collectSMB2CallsMetrics(
+	ch chan<- prometheus.Metric, smb2Calls *SMBProfileSMB2Calls) {
+	operationToProfileCallEntry := map[string]*SMBProfileCallEntry{
+		"negprot":   &smb2Calls.NegProt,
+		"sesssetup": &smb2Calls.SessSetup,
+		"logoff":    &smb2Calls.LogOff,
+		"tcon":      &smb2Calls.Tcon,
+		"tdis":      &smb2Calls.Tdis,
+		"create":    &smb2Calls.Create,
+		"close":     &smb2Calls.Close,
+		"flush":     &smb2Calls.Flush,
+		"read":      &smb2Calls.Read,
+		"write":     &smb2Calls.Write,
+		"lock":      &smb2Calls.Lock,
+		"ioctl":     &smb2Calls.Ioctl,
+		"cancel":    &smb2Calls.Cancel,
+		"keepalive": &smb2Calls.KeepAlive,
+		"find":      &smb2Calls.Find,
+		"notify":    &smb2Calls.Notify,
+		"getinfo":   &smb2Calls.GetInfo,
+		"setinfo":   &smb2Calls.SetInfo,
+		"break":     &smb2Calls.Break,
+	}
+	for op, pce := range operationToProfileCallEntry {
+		ch <- col.smb2RequestTotalMetric(op, pce)
+		ch <- col.smb2RequestInbytesMetric(op, pce)
+		ch <- col.smb2RequestOutbytesMetric(op, pce)
+		ch <- col.smb2RequestDurationMetric(op, pce)
+	}
+}
+
+func (col *smbProfileCollector) collectSysCallsMetrics(
+	ch chan<- prometheus.Metric, sysCalls *SMBProfileSyscalls) {
+	operationToProfileIOEntry := map[string]*SMBProfileIOEntry{
+		"pread":       &sysCalls.PRead,
+		"asys_pread":  &sysCalls.AsysPRead,
+		"pwrite":      &sysCalls.PWrite,
+		"asys_pwrite": &sysCalls.AsysPWrite,
+		"asys_fsync":  &sysCalls.AsysFSync,
+	}
+	operationToProfileEntry := map[string]*SMBProfileEntry{
+		"opendir":    &sysCalls.Opendir,
+		"fdopendir":  &sysCalls.FDOpendir,
+		"readdir":    &sysCalls.Readdir,
+		"rewinddir":  &sysCalls.Rewinddir,
+		"mkdirat":    &sysCalls.Mkdirat,
+		"closedir":   &sysCalls.Closedir,
+		"open":       &sysCalls.Open,
+		"openat":     &sysCalls.OpenAt,
+		"createfile": &sysCalls.CreateFile,
+		"close":      &sysCalls.Close,
+		"lseek":      &sysCalls.Lseek,
+		"renameat":   &sysCalls.RenameAt,
+		"stat":       &sysCalls.Stat,
+		"fstat":      &sysCalls.FStat,
+		"lstat":      &sysCalls.LStat,
+		"fstatat":    &sysCalls.FStatAt,
+		"unlinkat":   &sysCalls.UnlinkAt,
+		"chmod":      &sysCalls.Chmod,
+		"fchmod":     &sysCalls.FChmod,
+		"fchown":     &sysCalls.FChown,
+		"lchown":     &sysCalls.LChown,
+		"chdir":      &sysCalls.Chdir,
+		"getwd":      &sysCalls.GetWD,
+		"fntimes":    &sysCalls.Fntimes,
+		"ftruncate":  &sysCalls.FTruncate,
+		"fallocate":  &sysCalls.FAllocate,
+		"readlinkat": &sysCalls.ReadLinkAt,
+		"symlinkat":  &sysCalls.SymLinkAt,
+		"linkat":     &sysCalls.LinkAt,
+		"mknodat":    &sysCalls.MknodAt,
+		"realpath":   &sysCalls.RealPath,
+	}
+	for op, pioe := range operationToProfileIOEntry {
+		ch <- col.vfsIOTotalMetric(op, pioe)
+		ch <- col.vfsIOBytesMetric(op, pioe)
+		ch <- col.vfsIODurationMetric(op, pioe)
+	}
+	for op, pe := range operationToProfileEntry {
+		ch <- col.vfsTotalMetric(op, pe)
+		ch <- col.vfsDurationMetric(op, pe)
+	}
+}
+
+func (col *smbProfileCollector) smb2RequestTotalMetric(operation string,
+	pce *SMBProfileCallEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[0],
 		prometheus.GaugeValue,
 		float64(pce.Count),
-		strconv.Itoa(pce.Time),
-		strconv.Itoa(pce.Idle),
-		strconv.Itoa(pce.Inbytes),
-		strconv.Itoa(pce.Outbytes),
 		operation)
 }
 
-func (col *smbProfileCollector) vfsIORequestMetric(pioe *SMBProfileIOEntry,
-	operation string) prometheus.Metric {
+func (col *smbProfileCollector) smb2RequestInbytesMetric(operation string,
+	pce *SMBProfileCallEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[1],
 		prometheus.GaugeValue,
-		float64(pioe.Count),
-		strconv.Itoa(pioe.Time),
-		strconv.Itoa(pioe.Idle),
-		strconv.Itoa(pioe.Bytes),
+		float64(pce.Inbytes),
 		operation)
 }
 
-func (col *smbProfileCollector) vfsRequestMetric(pe *SMBProfileEntry,
-	operation string) prometheus.Metric {
+func (col *smbProfileCollector) smb2RequestOutbytesMetric(operation string,
+	pce *SMBProfileCallEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[2],
 		prometheus.GaugeValue,
+		float64(pce.Outbytes),
+		operation)
+}
+
+func (col *smbProfileCollector) smb2RequestDurationMetric(operation string,
+	pce *SMBProfileCallEntry) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		col.dsc[3],
+		prometheus.GaugeValue,
+		float64(pce.Time),
+		operation)
+}
+
+func (col *smbProfileCollector) vfsIOTotalMetric(operation string,
+	pioe *SMBProfileIOEntry) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		col.dsc[4],
+		prometheus.GaugeValue,
+		float64(pioe.Count),
+		operation)
+}
+
+func (col *smbProfileCollector) vfsIOBytesMetric(operation string,
+	pioe *SMBProfileIOEntry) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		col.dsc[5],
+		prometheus.GaugeValue,
+		float64(pioe.Bytes),
+		operation)
+}
+
+func (col *smbProfileCollector) vfsIODurationMetric(operation string,
+	pioe *SMBProfileIOEntry) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		col.dsc[6],
+		prometheus.GaugeValue,
+		float64(pioe.Time),
+		operation)
+}
+
+func (col *smbProfileCollector) vfsTotalMetric(operation string,
+	pe *SMBProfileEntry) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		col.dsc[7],
+		prometheus.GaugeValue,
 		float64(pe.Count),
-		strconv.Itoa(pe.Time),
+		operation)
+}
+
+func (col *smbProfileCollector) vfsDurationMetric(operation string,
+	pe *SMBProfileEntry) prometheus.Metric {
+	return prometheus.MustNewConstMetric(
+		col.dsc[8],
+		prometheus.GaugeValue,
+		float64(pe.Time),
 		operation)
 }
 
@@ -265,15 +339,39 @@ func (sme *smbMetricsExporter) newSMBProfileCollector() prometheus.Collector {
 		prometheus.NewDesc(
 			collectorName("smb2", "request_total"),
 			"Total number of SMB2 requests",
-			[]string{"time", "idle", "inbytes", "outbytes", "operation"}, nil),
+			[]string{"operation"}, nil),
 		prometheus.NewDesc(
-			collectorName("vfs_io", "call_total"),
+			collectorName("smb2", "request_inbytes"),
+			"Bytes received for SMB2 requests",
+			[]string{"operation"}, nil),
+		prometheus.NewDesc(
+			collectorName("smb2", "request_outbytes"),
+			"Bytes replied for SMB2 requests",
+			[]string{"operation"}, nil),
+		prometheus.NewDesc(
+			collectorName("smb2", "request_duration_microseconds_sum"),
+			"Execution time in microseconds of SMB2 requests",
+			[]string{"operation"}, nil),
+		prometheus.NewDesc(
+			collectorName("vfs_io", "total"),
 			"Total number of I/O calls to underlying VFS layer",
-			[]string{"time", "idle", "bytes", "operation"}, nil),
+			[]string{"operation"}, nil),
 		prometheus.NewDesc(
-			collectorName("vfs", "call_total"),
+			collectorName("vfs_io", "bytes"),
+			"Number of bytes transferred via underlying VFS I/O layer",
+			[]string{"operation"}, nil),
+		prometheus.NewDesc(
+			collectorName("vfs_io", "duration_microseconds_sum"),
+			"Execution time in microseconds of VFS I/O requests",
+			[]string{"operation"}, nil),
+		prometheus.NewDesc(
+			collectorName("vfs", "total"),
 			"Total number of calls to underlying VFS layer",
-			[]string{"time", "operation"}, nil),
+			[]string{"operation"}, nil),
+		prometheus.NewDesc(
+			collectorName("vfs", "duration_microseconds_sum"),
+			"Execution time in microseconds of VFS requests",
+			[]string{"operation"}, nil),
 	}
 
 	return col
