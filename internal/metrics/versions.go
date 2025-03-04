@@ -64,3 +64,7 @@ func resolveCtdbVersion() (string, error) {
 func executeRpmQCommand(name string) (string, error) {
 	return executeCommand("rpm", "-q", name)
 }
+
+func resolveNetbiosName() (string, error) {
+	return executeCommand("net", "conf", "getparm", "global", "netbios name")
+}

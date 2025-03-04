@@ -63,7 +63,7 @@ $ curl --request GET "http://localhost:9922/metrics"
 
 # HELP smb_metrics_status Current metrics-collector status versions
 # TYPE smb_metrics_status gauge
-smb_metrics_status{commitid="092fe2bb0",ctdbvers="4.20.0-103",sambaimage="",sambavers="4.20.0-103",version="v0.2-28-g092fe2b"} 1
+smb_metrics_status{commitid="092fe2bb0",ctdbvers="4.20.0-103",netbiosname="cluster1",sambaimage="",sambavers="4.20.0-103",version="v0.2-28-g092fe2b"} 1
 # HELP smb_sessions_total Number of currently active SMB sessions
 # TYPE smb_sessions_total gauge
 smb_sessions_total 8

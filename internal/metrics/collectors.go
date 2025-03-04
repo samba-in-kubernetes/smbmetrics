@@ -48,6 +48,10 @@ func (col *smbVersionsCollector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		status = 1
 	}
+	netbiosName, err := resolveNetbiosName()
+	if err != nil {
+		netbiosName = ""
+	}
 	ch <- prometheus.MustNewConstMetric(
 		col.dsc[0],
 		prometheus.GaugeValue,
@@ -57,6 +61,7 @@ func (col *smbVersionsCollector) Collect(ch chan<- prometheus.Metric) {
 		vers.SambaImage,
 		vers.SambaVersion,
 		vers.CtdbVersion,
+		netbiosName,
 	)
 }
 
@@ -74,6 +79,7 @@ func (sme *smbMetricsExporter) newSMBVersionsCollector() prometheus.Collector {
 				"sambaimage",
 				"sambavers",
 				"ctdbvers",
+				"netbiosname",
 			}, nil),
 	}
 	return col
