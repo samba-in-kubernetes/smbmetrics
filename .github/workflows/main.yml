@@ -10,9 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: ">=1.21.0"
+          go-version: "stable"
       - uses: actions/checkout@v4
       - name: Build
         run: make
@@ -20,9 +20,9 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v3
+      - uses: actions/setup-go@v5
         with:
-          go-version: ">=1.21.0"
+          go-version: "stable"
       - uses: actions/checkout@v4
       - name: Install build tools
         run: make build-tools
