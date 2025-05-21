@@ -139,3 +139,51 @@ func TestParseSMBStatusProfileNoData(t *testing.T) {
 	assert.Nil(t, profile.SystemCalls)
 	assert.Nil(t, profile.SMB2Calls)
 }
+
+func TestParseSMBStatusProfilePerShare(t *testing.T) {
+	testdata := readTestData(t, "smbstatus-profile-per-share.json")
+	profile, err := parseSMBProfile(testdata)
+	assert.NoError(t, err)
+	assert.NotNil(t, profile.SmbdLoop)
+	assert.NotNil(t, profile.SystemCalls)
+	assert.NotNil(t, profile.SMB2Calls)
+	assert.NotNil(t, profile.Extended)
+	assert.Equal(t, len(profile.Extended), 2)
+	for key, pershare := range profile.Extended {
+		assert.Greater(t, len(key), 0)
+		assert.Greater(t, pershare.SystemCalls.Readdir.Count, 1)
+		assert.Greater(t, pershare.SystemCalls.Readdir.Time, 1)
+		assert.Greater(t, pershare.SMB2Calls.Find.Inbytes, 1)
+		assert.Greater(t, pershare.SMB2Calls.Find.Outbytes, 1)
+	}
+}
+
+func TestParseSMBStatusProfilePerShare2(t *testing.T) {
+	testdata := readTestData(t, "smbstatus-profile-per-share2.json")
+	profile, err := parseSMBProfile(testdata)
+	assert.NoError(t, err)
+	assert.NotNil(t, profile.SmbdLoop)
+	assert.NotNil(t, profile.SystemCalls)
+	assert.NotNil(t, profile.SMB2Calls)
+	assert.NotNil(t, profile.Extended)
+	assert.Equal(t, len(profile.Extended), 2)
+	prevClientIP := ""
+	numClients := 0
+	for key, pershare := range profile.Extended {
+		assert.Greater(t, len(key), 0)
+		shareName, clientIP := ParseExtendedProfileKey(key)
+		assert.NotEmpty(t, shareName)
+		assert.NotEmpty(t, clientIP)
+		assert.True(t, strings.HasPrefix(shareName, "smbshare"))
+		assert.NotEqual(t, clientIP, prevClientIP)
+		prevClientIP = clientIP
+
+		if clientIP == "192.168.122.25" {
+			assert.Greater(t, pershare.SMB2Calls.Read.Count, 0)
+		} else {
+			assert.Greater(t, pershare.SMB2Calls.Write.Count, 0)
+		}
+		numClients++
+	}
+	assert.Equal(t, numClients, 2)
+}
