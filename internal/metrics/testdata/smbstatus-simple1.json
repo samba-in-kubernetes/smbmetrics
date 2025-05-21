@@ -1,0 +1,49 @@
+{
+  "timestamp": "2022-07-19T16:26:34.652845+0530",
+  "version": "4.17.0pre1-GIT-130283cbae0",
+  "smb_conf": "/usr/local/etc/samba/smb.conf",
+  "tcons": {
+    "2464814757": {
+      "service": "gluster-vol",
+      "server_id": {
+        "pid": "4214",
+        "task_id": "0",
+        "vnn": "0",
+        "unique_id": "18344755514750214344"
+      },
+      "tcon_id": "2464814757",
+      "session_id": "659628098",
+      "machine": "192.168.122.155",
+      "connected_at": "2022-07-19T16:20:37+0530",
+      "encryption": {
+        "cipher": "",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "",
+        "degree": "none"
+      }
+    },
+    "2542351833": {
+      "service": "gluster-vol",
+      "server_id": {
+        "pid": "5299",
+        "task_id": "0",
+        "vnn": "1",
+        "unique_id": "13525406857402943822"
+      },
+      "tcon_id": "2542351833",
+      "session_id": "687866031",
+      "machine": "192.168.122.1",
+      "connected_at": "2022-07-19T16:24:52+0530",
+      "encryption": {
+        "cipher": "",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "",
+        "degree": "none"
+      }
+    }
+  }
+}
