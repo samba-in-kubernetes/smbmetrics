@@ -40,6 +40,16 @@ jobs:
         run: git fetch
       - name: Lint git commit messages
         run: make check-gitlint
+  test:
+    needs: [build, check]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+      - uses: actions/checkout@v4
+      - name: Run tests
+        run: make test
   podmanbuild:
     runs-on: ubuntu-latest
     # don't run on push, since the "push" job contains the
@@ -81,7 +91,7 @@ jobs:
         run: make CONTAINER_CMD=docker image-build
   # push the container to quay.io - only for pushes, not PRs
   push:
-    needs: [build, check]
+    needs: [build, check, test]
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
