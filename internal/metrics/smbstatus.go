@@ -456,14 +456,16 @@ func (smbstat *SMBStatus) ListTreeCons() []SMBStatusTreeCon {
 // share-name and client-ip as string. Returns a pair of empty strings in case
 // of parse failure.
 func ParseExtendedProfileKey(key string) (shareName, clientIP string) {
+	shareName = ""
+	clientIP = ""
 	sp := strings.Split(key, ":")
 	if len(sp) != 2 {
-		return "", ""
+		return
 	}
 	shareName = sp[0]
 	sp = strings.Split(sp[1], "[")
 	if len(sp) != 2 {
-		return "", ""
+		return
 	}
 	clientIP = strings.Trim(sp[1], "[]")
 	return

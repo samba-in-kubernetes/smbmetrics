@@ -27,8 +27,20 @@ func (sme *smbMetricsExporter) register() error {
 
 type smbCollector struct {
 	// nolint:structcheck
-	sme *smbMetricsExporter
-	dsc []*prometheus.Desc
+	sme         *smbMetricsExporter
+	dsc         []*prometheus.Desc
+	netbiosName string
+}
+
+func (col *smbCollector) Refresh() {
+	if col.netbiosName != "" {
+		return
+	}
+	netbiosName, err := resolveNetbiosName()
+	if err != nil {
+		return
+	}
+	col.netbiosName = netbiosName
 }
 
 func (col *smbCollector) Describe(ch chan<- *prometheus.Desc) {
@@ -44,13 +56,10 @@ type smbVersionsCollector struct {
 
 func (col *smbVersionsCollector) Collect(ch chan<- prometheus.Metric) {
 	status := 0
+	col.Refresh()
 	vers, err := ResolveVersions(col.clnt)
 	if err != nil {
 		status = 1
-	}
-	netbiosName, err := resolveNetbiosName()
-	if err != nil {
-		netbiosName = ""
 	}
 	ch <- prometheus.MustNewConstMetric(
 		col.dsc[0],
@@ -61,7 +70,7 @@ func (col *smbVersionsCollector) Collect(ch chan<- prometheus.Metric) {
 		vers.SambaImage,
 		vers.SambaVersion,
 		vers.CtdbVersion,
-		netbiosName,
+		col.netbiosName,
 	)
 }
 
@@ -94,6 +103,7 @@ func (col *smbStatusCollector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		return
 	}
+	col.Refresh()
 	ch <- prometheus.MustNewConstMetric(col.dsc[0],
 		prometheus.GaugeValue, float64(smbInfo.TotalSessions()))
 
@@ -163,18 +173,34 @@ func (col *smbProfileCollector) Collect(ch chan<- prometheus.Metric) {
 	if err != nil {
 		return
 	}
+	col.Refresh()
 	smb2Calls := smbProfileInfo.profileStatus.SMB2Calls
 	if smb2Calls != nil {
-		col.collectSMB2CallsMetrics(ch, smb2Calls)
+		col.collectSMB2CallsMetrics(ch, smb2Calls, "", "")
 	}
 	sysCalls := smbProfileInfo.profileStatus.SystemCalls
 	if sysCalls != nil {
-		col.collectSysCallsMetrics(ch, sysCalls)
+		col.collectSysCallsMetrics(ch, sysCalls, "", "")
+	}
+	for key, extended := range smbProfileInfo.profileStatus.Extended {
+		sharename, client := ParseExtendedProfileKey(key)
+		if sharename == "" || client == "" {
+			continue
+		}
+		smb2Calls = extended.SMB2Calls
+		if smb2Calls != nil {
+			col.collectSMB2CallsMetrics(ch, smb2Calls, sharename, client)
+		}
+		sysCalls = extended.SystemCalls
+		if sysCalls != nil {
+			col.collectSysCallsMetrics(ch, sysCalls, sharename, client)
+		}
 	}
 }
 
 func (col *smbProfileCollector) collectSMB2CallsMetrics(
-	ch chan<- prometheus.Metric, smb2Calls *SMBProfileSMB2Calls) {
+	ch chan<- prometheus.Metric, smb2Calls *SMBProfileSMB2Calls,
+	sharename, client string) {
 	operationToProfileCallEntry := map[string]*SMBProfileCallEntry{
 		"negprot":   &smb2Calls.NegProt,
 		"sesssetup": &smb2Calls.SessSetup,
@@ -197,15 +223,16 @@ func (col *smbProfileCollector) collectSMB2CallsMetrics(
 		"break":     &smb2Calls.Break,
 	}
 	for op, pce := range operationToProfileCallEntry {
-		ch <- col.smb2RequestTotalMetric(op, pce)
-		ch <- col.smb2RequestInbytesMetric(op, pce)
-		ch <- col.smb2RequestOutbytesMetric(op, pce)
-		ch <- col.smb2RequestDurationMetric(op, pce)
+		ch <- col.smb2RequestTotalMetric(sharename, client, op, pce)
+		ch <- col.smb2RequestInbytesMetric(sharename, client, op, pce)
+		ch <- col.smb2RequestOutbytesMetric(sharename, client, op, pce)
+		ch <- col.smb2RequestDurationMetric(sharename, client, op, pce)
 	}
 }
 
 func (col *smbProfileCollector) collectSysCallsMetrics(
-	ch chan<- prometheus.Metric, sysCalls *SMBProfileSyscalls) {
+	ch chan<- prometheus.Metric, sysCalls *SMBProfileSyscalls,
+	sharename, client string) {
 	operationToProfileIOEntry := map[string]*SMBProfileIOEntry{
 		"pread":       &sysCalls.PRead,
 		"asys_pread":  &sysCalls.AsysPRead,
@@ -247,137 +274,165 @@ func (col *smbProfileCollector) collectSysCallsMetrics(
 		"realpath":   &sysCalls.RealPath,
 	}
 	for op, pioe := range operationToProfileIOEntry {
-		ch <- col.vfsIOTotalMetric(op, pioe)
-		ch <- col.vfsIOBytesMetric(op, pioe)
-		ch <- col.vfsIODurationMetric(op, pioe)
+		ch <- col.vfsIOTotalMetric(sharename, client, op, pioe)
+		ch <- col.vfsIOBytesMetric(sharename, client, op, pioe)
+		ch <- col.vfsIODurationMetric(sharename, client, op, pioe)
 	}
 	for op, pe := range operationToProfileEntry {
-		ch <- col.vfsTotalMetric(op, pe)
-		ch <- col.vfsDurationMetric(op, pe)
+		ch <- col.vfsTotalMetric(sharename, client, op, pe)
+		ch <- col.vfsDurationMetric(sharename, client, op, pe)
 	}
 }
 
-func (col *smbProfileCollector) smb2RequestTotalMetric(operation string,
-	pce *SMBProfileCallEntry) prometheus.Metric {
+func (col *smbProfileCollector) smb2RequestTotalMetric(
+	sharename, client, operation string, pce *SMBProfileCallEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[0],
 		prometheus.GaugeValue,
 		float64(pce.Count),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) smb2RequestInbytesMetric(operation string,
-	pce *SMBProfileCallEntry) prometheus.Metric {
+func (col *smbProfileCollector) smb2RequestInbytesMetric(
+	sharename, client, operation string, pce *SMBProfileCallEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[1],
 		prometheus.GaugeValue,
 		float64(pce.Inbytes),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) smb2RequestOutbytesMetric(operation string,
-	pce *SMBProfileCallEntry) prometheus.Metric {
+func (col *smbProfileCollector) smb2RequestOutbytesMetric(
+	sharename, client, operation string, pce *SMBProfileCallEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[2],
 		prometheus.GaugeValue,
 		float64(pce.Outbytes),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) smb2RequestDurationMetric(operation string,
-	pce *SMBProfileCallEntry) prometheus.Metric {
+func (col *smbProfileCollector) smb2RequestDurationMetric(
+	sharename, client, operation string, pce *SMBProfileCallEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[3],
 		prometheus.GaugeValue,
 		float64(pce.Time),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) vfsIOTotalMetric(operation string,
-	pioe *SMBProfileIOEntry) prometheus.Metric {
+func (col *smbProfileCollector) vfsIOTotalMetric(
+	sharename, client, operation string, pioe *SMBProfileIOEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[4],
 		prometheus.GaugeValue,
 		float64(pioe.Count),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) vfsIOBytesMetric(operation string,
-	pioe *SMBProfileIOEntry) prometheus.Metric {
+func (col *smbProfileCollector) vfsIOBytesMetric(
+	sharename, client, operation string, pioe *SMBProfileIOEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[5],
 		prometheus.GaugeValue,
 		float64(pioe.Bytes),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) vfsIODurationMetric(operation string,
-	pioe *SMBProfileIOEntry) prometheus.Metric {
+func (col *smbProfileCollector) vfsIODurationMetric(
+	sharename, client, operation string, pioe *SMBProfileIOEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[6],
 		prometheus.GaugeValue,
 		float64(pioe.Time),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) vfsTotalMetric(operation string,
-	pe *SMBProfileEntry) prometheus.Metric {
+func (col *smbProfileCollector) vfsTotalMetric(
+	sharename, client, operation string, pe *SMBProfileEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[7],
 		prometheus.GaugeValue,
 		float64(pe.Count),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
-func (col *smbProfileCollector) vfsDurationMetric(operation string,
-	pe *SMBProfileEntry) prometheus.Metric {
+func (col *smbProfileCollector) vfsDurationMetric(
+	sharename, client, operation string, pe *SMBProfileEntry) prometheus.Metric {
 	return prometheus.MustNewConstMetric(
 		col.dsc[8],
 		prometheus.GaugeValue,
 		float64(pe.Time),
+		col.netbiosName,
+		sharename,
+		client,
 		operation)
 }
 
 func (sme *smbMetricsExporter) newSMBProfileCollector() prometheus.Collector {
+	variableLabels := []string{"netbiosname", "share", "client", "operation"}
 	col := &smbProfileCollector{}
 	col.sme = sme
 	col.dsc = []*prometheus.Desc{
 		prometheus.NewDesc(
 			collectorName("smb2", "request_total"),
 			"Total number of SMB2 requests",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("smb2", "request_inbytes"),
 			"Bytes received for SMB2 requests",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("smb2", "request_outbytes"),
 			"Bytes replied for SMB2 requests",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("smb2", "request_duration_microseconds_sum"),
 			"Execution time in microseconds of SMB2 requests",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("vfs_io", "total"),
 			"Total number of I/O calls to underlying VFS layer",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("vfs_io", "bytes"),
 			"Number of bytes transferred via underlying VFS I/O layer",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("vfs_io", "duration_microseconds_sum"),
 			"Execution time in microseconds of VFS I/O requests",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("vfs", "total"),
 			"Total number of calls to underlying VFS layer",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 		prometheus.NewDesc(
 			collectorName("vfs", "duration_microseconds_sum"),
 			"Execution time in microseconds of VFS requests",
-			[]string{"operation"}, nil),
+			variableLabels, nil),
 	}
 
 	return col
