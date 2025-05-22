@@ -5,6 +5,7 @@ package metrics
 import (
 	"io"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -155,6 +156,11 @@ func TestParseSMBStatusProfilePerShare(t *testing.T) {
 		assert.Greater(t, pershare.SystemCalls.Readdir.Time, 1)
 		assert.Greater(t, pershare.SMB2Calls.Find.Inbytes, 1)
 		assert.Greater(t, pershare.SMB2Calls.Find.Outbytes, 1)
+
+		shareName, clientIP := ParseExtendedProfileKey(key)
+		assert.NotEmpty(t, shareName)
+		assert.NotEmpty(t, clientIP)
+		assert.True(t, strings.HasPrefix(shareName, "smbshare"))
 	}
 }
 
