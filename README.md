@@ -266,3 +266,41 @@ smb_vfs_duration_microseconds_sum{operation="stat"} 131346
 smb_vfs_duration_microseconds_sum{operation="symlinkat"} 0
 smb_vfs_duration_microseconds_sum{operation="unlinkat"} 106974
 ```
+
+When running with profile-per-share enabled ("smbd profiling share = on")
+we get additional per-share metrics:
+
+```console
+smb_smb2_request_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="close",share="smbshare"} 7351
+smb_smb2_request_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="create",share="smbshare"} 59801
+smb_smb2_request_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="find",share="smbshare"} 5972
+smb_smb2_request_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="flush",share="smbshare"} 10257
+...
+smb_smb2_request_inbytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="close",share="smbshare"} 1584
+smb_smb2_request_inbytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="create",share="smbshare"} 3336
+smb_smb2_request_inbytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="find",share="smbshare"} 392
+smb_smb2_request_inbytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="flush",share="smbshare"} 88
+...
+smb_smb2_request_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="close",share="smbshare"} 18
+smb_smb2_request_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="create",share="smbshare"} 18
+smb_smb2_request_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="find",share="smbshare"} 4
+smb_smb2_request_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="flush",share="smbshare"} 1
+...
+smb_vfs_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="chdir",share="smbshare"} 562
+smb_vfs_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="chmod",share="smbshare"} 0
+smb_vfs_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="close",share="smbshare"} 4279
+smb_vfs_duration_microseconds_sum{client="192.168.122.25",netbiosname="smb-cephfs",operation="closedir",share="smbshare"} 46
+...
+smb_vfs_io_bytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="asys_fsync",share="smbshare"} 0
+smb_vfs_io_bytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="asys_pread",share="smbshare"} 303
+smb_vfs_io_bytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="asys_pwrite",share="smbshare"} 17
+smb_vfs_io_bytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="pread",share="smbshare"} 0
+smb_vfs_io_bytes{client="192.168.122.25",netbiosname="smb-cephfs",operation="pwrite",share="smbshare"} 0
+...
+smb_vfs_io_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="asys_fsync",share="smbshare"} 1
+smb_vfs_io_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="asys_pread",share="smbshare"} 2
+smb_vfs_io_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="asys_pwrite",share="smbshare"} 1
+smb_vfs_io_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="pread",share="smbshare"} 0
+smb_vfs_io_total{client="192.168.122.25",netbiosname="smb-cephfs",operation="pwrite",share="smbshare"} 0
+...
+```
