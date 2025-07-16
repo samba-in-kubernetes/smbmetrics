@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Allow manually triggering a run in the github ui.
+  # See: https://docs.github.com/en/actions/using-workflows/manually-running-a-workflow
+  workflow_dispatch: {}
+
 jobs:
   # Do a build/compile smoke test
   build:
