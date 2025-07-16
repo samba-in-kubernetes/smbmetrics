@@ -1,8 +1,11 @@
-# Build smbmetrics
-FROM docker.io/golang:1.24 as builder
+# Args
+ARG BASE_IMG="quay.io/samba.org/samba-server:latest"
 ARG GIT_VERSION="(unset)"
 ARG COMMIT_ID="(unset)"
 ARG ARCH=""
+
+# Build smbmetrics
+FROM docker.io/golang:1.24 as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -23,7 +26,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${ARCH} GO111MODULE=on \
     -o smbmetrics cmd/main.go
 
 # Use samba-server (with its smb.conf and samba utils) as base image
-FROM quay.io/samba.org/samba-server
+FROM $BASE_IMG
 COPY --from=builder /workspace/smbmetrics /bin/smbmetrics
 
 ENTRYPOINT ["/bin/smbmetrics"]
