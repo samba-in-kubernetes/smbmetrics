@@ -110,3 +110,9 @@ jobs:
       - name: push container image
         # note: forcing use of docker here, since we did docker login above
         run: make CONTAINER_CMD=docker image-push
+      - name: build dev container image
+        # note: forcing use of docker here, since we did docker login above
+        run: make CONTAINER_CMD=docker BASE_IMG_TAG=devbuilds-centos-amd64 image-build
+      - name: push dev container image
+        # note: forcing use of docker here, since we did docker login above
+        run: make CONTAINER_CMD=docker BASE_IMG_TAG=devbuilds-centos-amd64 image-push
