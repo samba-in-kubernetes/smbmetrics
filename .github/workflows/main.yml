@@ -116,3 +116,9 @@ jobs:
       - name: push dev container image
         # note: forcing use of docker here, since we did docker login above
         run: make CONTAINER_CMD=docker BASE_IMG_TAG=devbuilds-centos-amd64 image-push
+      - name: build ceph20 container image
+        # note: forcing use of docker here, since we did docker login above
+        run: make CONTAINER_CMD=docker BASE_IMG_TAG=ceph20-centos-amd64 image-build
+      - name: push ceph20 container image
+        # note: forcing use of docker here, since we did docker login above
+        run: make CONTAINER_CMD=docker BASE_IMG_TAG=ceph20-centos-amd64 image-push
