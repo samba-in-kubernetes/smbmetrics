@@ -138,12 +138,11 @@ type SMBStatusOpenLease struct {
 
 // SMBStatus represents output of 'smbstatus --json'
 type SMBStatus struct {
-	Timestamp string                       `json:"timestamp"`
-	Version   string                       `json:"version"`
-	SmbConf   string                       `json:"smb_conf"`
-	Sessions  map[string]SMBStatusSession  `json:"sessions"`
-	TCons     map[string]SMBStatusTreeCon  `json:"tcons"`
-	OpenFiles map[string]SMBStatusOpenFile `json:"open_files"`
+	Timestamp string                      `json:"timestamp"`
+	Version   string                      `json:"version"`
+	SmbConf   string                      `json:"smb_conf"`
+	Sessions  map[string]SMBStatusSession `json:"sessions"`
+	TCons     map[string]SMBStatusTreeCon `json:"tcons"`
 }
 
 // SMBStatusLocks represents output of 'smbstatus -L --json'
@@ -152,6 +151,127 @@ type SMBStatusLocks struct {
 	Version   string                       `json:"version"`
 	SmbConf   string                       `json:"smb_conf"`
 	OpenFiles map[string]SMBStatusOpenFile `json:"open_files"`
+}
+
+// SMBProfileEntry represents basic profile entry of 'smbstatus --profile'
+type SMBProfileEntry struct {
+	Count int `json:"count"`
+	Time  int `json:"time"`
+}
+
+// SMBProfileSyscalls represents 'SMBD loop' entries of 'smbstatus --profile'
+type SMBProfileLoop struct {
+	Connect       SMBProfileEntry `json:"connect"`
+	Disconnect    SMBProfileEntry `json:"disconnect"`
+	Idle          SMBProfileEntry `json:"idle"`
+	CPUUser       SMBProfileEntry `json:"cpu_user"`
+	CPUSystem     SMBProfileEntry `json:"cpu_system"`
+	Request       SMBProfileEntry `json:"request"`
+	PushSecCtx    SMBProfileEntry `json:"push_sec_ctx"`
+	SetSecCtx     SMBProfileEntry `json:"set_sec_ctx"`
+	SetRootSecCtx SMBProfileEntry `json:"set_root_sec_ctx"`
+	PopSecCtx     SMBProfileEntry `json:"pop_sec_ctx"`
+}
+
+// SMBProfileIOEntry represents async-io profile entry of 'smbstatus --profile'
+type SMBProfileIOEntry struct {
+	SMBProfileEntry
+	Idle  int `json:"idle"`
+	Bytes int `json:"bytes"`
+}
+
+// SMBProfileSyscalls represents 'System Calls' entries of 'smbstatus --profile'
+type SMBProfileSyscalls struct {
+	Opendir        SMBProfileEntry   `json:"syscall_opendir"`
+	FDOpendir      SMBProfileEntry   `json:"syscall_fdopendir"`
+	Readdir        SMBProfileEntry   `json:"syscall_readdir"`
+	Rewinddir      SMBProfileEntry   `json:"syscall_rewinddir"`
+	Mkdirat        SMBProfileEntry   `json:"syscall_mkdirat"`
+	Closedir       SMBProfileEntry   `json:"syscall_closedir"`
+	Open           SMBProfileEntry   `json:"syscall_open"`
+	OpenAt         SMBProfileEntry   `json:"syscall_openat"`
+	CreateFile     SMBProfileEntry   `json:"syscall_createfile"`
+	Close          SMBProfileEntry   `json:"syscall_close"`
+	PRead          SMBProfileIOEntry `json:"syscall_pread"`
+	AsysPRead      SMBProfileIOEntry `json:"syscall_asys_pread"`
+	PWrite         SMBProfileIOEntry `json:"syscall_pwrite"`
+	AsysPWrite     SMBProfileIOEntry `json:"syscall_asys_pwrite"`
+	Lseek          SMBProfileEntry   `json:"syscall_lseek"`
+	SendFile       SMBProfileIOEntry `json:"syscall_sendfile"`
+	RecvFile       SMBProfileIOEntry `json:"syscall_recvfile"`
+	RenameAt       SMBProfileEntry   `json:"syscall_renameat"`
+	AsysFSync      SMBProfileIOEntry `json:"syscall_asys_fsync"`
+	Stat           SMBProfileEntry   `json:"syscall_stat"`
+	FStat          SMBProfileEntry   `json:"syscall_fstat"`
+	LStat          SMBProfileEntry   `json:"syscall_lstat"`
+	FStatAt        SMBProfileEntry   `json:"syscall_fstatat"`
+	GetAllocSize   SMBProfileEntry   `json:"syscall_get_alloc_size"`
+	UnlinkAt       SMBProfileEntry   `json:"syscall_unlinkat"`
+	Chmod          SMBProfileEntry   `json:"syscall_chmod"`
+	FChmod         SMBProfileEntry   `json:"syscall_fchmod"`
+	FChown         SMBProfileEntry   `json:"syscall_fchown"`
+	LChown         SMBProfileEntry   `json:"syscall_lchown"`
+	Chdir          SMBProfileEntry   `json:"syscall_chdir"`
+	GetWD          SMBProfileEntry   `json:"syscall_getwd"`
+	Fntimes        SMBProfileEntry   `json:"syscall_fntimes"`
+	FTruncate      SMBProfileEntry   `json:"syscall_ftruncate"`
+	FAllocate      SMBProfileEntry   `json:"syscall_fallocate"`
+	ReadLinkAt     SMBProfileEntry   `json:"syscall_readlinkat"`
+	SymLinkAt      SMBProfileEntry   `json:"syscall_symlinkat"`
+	LinkAt         SMBProfileEntry   `json:"syscall_linkat"`
+	MknodAt        SMBProfileEntry   `json:"syscall_mknodat"`
+	RealPath       SMBProfileEntry   `json:"syscall_realpath"`
+	GetQuota       SMBProfileEntry   `json:"syscall_get_quota"`
+	SetQuota       SMBProfileEntry   `json:"syscall_set_quota"`
+	AsysGetXattrAt SMBProfileIOEntry `json:"syscall_asys_getxattrat"`
+}
+
+// SMBStatusProfile represents single call entry of 'smbstatus --profile'
+type SMBProfileCallEntry struct {
+	SMBProfileEntry
+	Idle     int `json:"idle"`
+	Inbytes  int `json:"inbytes"`
+	Outbytes int `json:"outbytes"`
+}
+
+// SMBProfileSMB2Calls represents 'SMB2 Calls' entries of 'smbstatus --profile'
+type SMBProfileSMB2Calls struct {
+	NegProt   SMBProfileCallEntry `json:"smb2_negprot"`
+	SessSetup SMBProfileCallEntry `json:"smb2_sesssetup"`
+	LogOff    SMBProfileCallEntry `json:"smb2_logoff"`
+	Tcon      SMBProfileCallEntry `json:"smb2_tcon"`
+	Tdis      SMBProfileCallEntry `json:"smb2_tdis"`
+	Create    SMBProfileCallEntry `json:"smb2_create"`
+	Close     SMBProfileCallEntry `json:"smb2_close"`
+	Flush     SMBProfileCallEntry `json:"smb2_flush"`
+	Read      SMBProfileCallEntry `json:"smb2_read"`
+	Write     SMBProfileCallEntry `json:"smb2_write"`
+	Lock      SMBProfileCallEntry `json:"smb2_lock"`
+	Ioctl     SMBProfileCallEntry `json:"smb2_ioctl"`
+	Cancel    SMBProfileCallEntry `json:"smb2_cancel"`
+	KeepAlive SMBProfileCallEntry `json:"smb2_keepalive"`
+	Find      SMBProfileCallEntry `json:"smb2_find"`
+	Notify    SMBProfileCallEntry `json:"smb2_notify"`
+	GetInfo   SMBProfileCallEntry `json:"smb2_getinfo"`
+	SetInfo   SMBProfileCallEntry `json:"smb2_setinfo"`
+	Break     SMBProfileCallEntry `json:"smb2_break"`
+}
+
+// SMBProfileShare represents per-share profile information
+type SMBProfileShare struct {
+	SystemCalls *SMBProfileSyscalls  `json:"System Calls"`
+	SMB2Calls   *SMBProfileSMB2Calls `json:"SMB2 Calls"`
+}
+
+// SMBProfile represents (a subset of the) output of 'smbstatus --profile'
+type SMBProfile struct {
+	Timestamp   string                      `json:"timestamp"`
+	Version     string                      `json:"version"`
+	SmbConf     string                      `json:"smb_conf"`
+	SmbdLoop    *SMBProfileLoop             `json:"SMBD loop"`
+	SystemCalls *SMBProfileSyscalls         `json:"System Calls"`
+	SMB2Calls   *SMBProfileSMB2Calls        `json:"SMB2 Calls"`
+	Extended    map[string]*SMBProfileShare `json:"Extended Profile"`
 }
 
 // LocateSMBStatus finds the local executable of 'smbstatus' on host.
@@ -175,15 +295,6 @@ func LocateSMBStatus() (string, error) {
 	return "", errors.New("failed to locate smbstatus")
 }
 
-// RunSMBStatus executes 'smbstatus --json' on host machine
-func RunSMBStatus() (*SMBStatus, error) {
-	dat, err := executeSMBStatusCommand("--json")
-	if err != nil {
-		return &SMBStatus{}, err
-	}
-	return parseSMBStatus(dat)
-}
-
 // RunSMBStatusVersion executes 'smbstatus --version' on host container
 func RunSMBStatusVersion() (string, error) {
 	ver, err := executeSMBStatusCommand("--version")
@@ -193,30 +304,27 @@ func RunSMBStatusVersion() (string, error) {
 	return ver, nil
 }
 
-// RunSMBStatusShares executes 'smbstatus --shares --json' on host
-func RunSMBStatusShares() ([]SMBStatusTreeCon, error) {
-	dat, err := executeSMBStatusCommand("--shares --json")
+// RunSMBStatusShares executes 'smbstatus --processes --json' on host
+func RunSMBStatusProcesses() (*SMBStatus, error) {
+	dat, err := executeSMBStatusCommand("--processes", "--json")
 	if err != nil {
-		return []SMBStatusTreeCon{}, err
+		return &SMBStatus{}, err
 	}
-	return parseSMBStatusTreeCons(dat)
+	return parseSMBStatus(dat)
 }
 
-func parseSMBStatusTreeCons(dat string) ([]SMBStatusTreeCon, error) {
-	tcons := []SMBStatusTreeCon{}
-	res, err := parseSMBStatus(dat)
+// RunSMBStatusShares executes 'smbstatus --shares --json' on host
+func RunSMBStatusShares() (*SMBStatus, error) {
+	dat, err := executeSMBStatusCommand("--shares", "--json")
 	if err != nil {
-		return tcons, err
+		return &SMBStatus{}, err
 	}
-	for _, share := range res.TCons {
-		tcons = append(tcons, share)
-	}
-	return tcons, nil
+	return parseSMBStatus(dat)
 }
 
 // RunSMBStatusLocks executes 'smbstatus --locks --json' on host
 func RunSMBStatusLocks() ([]SMBStatusOpenFile, error) {
-	dat, err := executeSMBStatusCommand("--locks --json")
+	dat, err := executeSMBStatusCommand("--locks", "--json")
 	if err != nil {
 		return []SMBStatusOpenFile{}, err
 	}
@@ -235,14 +343,23 @@ func parseSMBStatusLockedFiles(dat string) ([]SMBStatusOpenFile, error) {
 	return lockedFiles, nil
 }
 
+// RunSMBStatusProfile executes 'smbstatus --profile --json' on host
+func RunSMBStatusProfile() (*SMBProfile, error) {
+	dat, err := executeSMBStatusCommand("--profile", "--json")
+	if err != nil {
+		return &SMBProfile{}, err
+	}
+	return parseSMBProfile(dat)
+}
+
 // SMBStatusSharesByMachine converts the output of RunSMBStatusShares into map
 // indexed by machine's host
 func SMBStatusSharesByMachine() (map[string][]SMBStatusTreeCon, error) {
-	tcons, err := RunSMBStatusShares()
+	smbstat, err := RunSMBStatusShares()
 	if err != nil {
 		return map[string][]SMBStatusTreeCon{}, err
 	}
-	return makeSmbSharesMap(tcons), nil
+	return makeSmbSharesMap(smbstat.ListTreeCons()), nil
 }
 
 func makeSmbSharesMap(tcons []SMBStatusTreeCon) map[string][]SMBStatusTreeCon {
@@ -295,7 +412,61 @@ func NewSMBStatus() *SMBStatus {
 		SmbConf:   "",
 		Sessions:  map[string]SMBStatusSession{},
 		TCons:     map[string]SMBStatusTreeCon{},
-		OpenFiles: map[string]SMBStatusOpenFile{},
 	}
 	return &smbStatus
+}
+
+// parseSMBProfile parses to output of 'smbstatus --json --profile' into
+// internal representation.
+func parseSMBProfile(data string) (*SMBProfile, error) {
+	res := NewSMBProfile()
+	err := json.Unmarshal([]byte(data), res)
+	return res, err
+}
+
+// NewSMBProfile returns non-populated SMBStatusProfile object
+func NewSMBProfile() *SMBProfile {
+	smbStatusProfile := SMBProfile{
+		Timestamp: "",
+		Version:   "",
+		SmbConf:   "",
+	}
+	return &smbStatusProfile
+}
+
+// ListSessions returns a slice for mapped sessions
+func (smbstat *SMBStatus) ListSessions() []SMBStatusSession {
+	sessions := []SMBStatusSession{}
+	for _, session := range smbstat.Sessions {
+		sessions = append(sessions, session)
+	}
+	return sessions
+}
+
+// ListTreeCons returns a slice for mapped tree-connection
+func (smbstat *SMBStatus) ListTreeCons() []SMBStatusTreeCon {
+	tcons := []SMBStatusTreeCon{}
+	for _, share := range smbstat.TCons {
+		tcons = append(tcons, share)
+	}
+	return tcons
+}
+
+// ParseExtendedProfileKey parse the extended profile key into a pair of
+// share-name and client-ip as string. Returns a pair of empty strings in case
+// of parse failure.
+func ParseExtendedProfileKey(key string) (shareName, clientIP string) {
+	shareName = ""
+	clientIP = ""
+	sp := strings.Split(key, ":")
+	if len(sp) != 2 {
+		return
+	}
+	shareName = sp[0]
+	sp = strings.Split(sp[1], "[")
+	if len(sp) != 2 {
+		return
+	}
+	clientIP = strings.Trim(sp[1], "[]")
+	return
 }

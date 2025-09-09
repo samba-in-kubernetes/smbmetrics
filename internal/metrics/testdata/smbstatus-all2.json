@@ -1,0 +1,180 @@
+{
+  "timestamp": "2022-07-20T12:07:36.225955+0000",
+  "version": "4.17.0pre1-UNKNOWN",
+  "smb_conf": "/etc/samba/smb.conf",
+  "sessions": {},
+  "tcons": {
+    "348413079": {
+      "service": "IPC$",
+      "server_id": {
+        "pid": "101",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "7364797719700910696"
+      },
+      "tcon_id": "348413079",
+      "session_id": "674813472",
+      "machine": "127.0.0.1",
+      "connected_at": "2022-07-20T12:04:15+0000",
+      "encryption": {
+        "cipher": "",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "",
+        "degree": "none"
+      }
+    },
+    "1698398697": {
+      "service": "samba-share",
+      "server_id": {
+        "pid": "101",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "7364797719700910696"
+      },
+      "tcon_id": "1698398697",
+      "session_id": "674813472",
+      "machine": "127.0.0.1",
+      "connected_at": "2022-07-20T12:04:15+0000",
+      "encryption": {
+        "cipher": "",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "",
+        "degree": "none"
+      }
+    }
+  },
+  "open_files": {
+    "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee/a/y": {
+      "service_path": "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee",
+      "filename": "a/y",
+      "fileid": {
+        "devid": -397762331,
+        "inode": 13631494,
+        "extid": 0
+      },
+      "num_pending_deletes": 0,
+      "opens": {
+        "101/61": {
+          "server_id": {
+            "pid": "101",
+            "task_id": "0",
+            "vnn": "4294967295",
+            "unique_id": "7364797719700910696"
+          },
+          "uid": 1000,
+          "share_file_id": "61",
+          "sharemode": {
+            "hex": "0x00000007",
+            "NONE": false,
+            "READ": true,
+            "WRITE": true,
+            "DELETE": true,
+            "text": "RWD"
+          },
+          "access_mask": {
+            "hex": "0x0012019f",
+            "READ_DATA": true,
+            "WRITE_DATA": true,
+            "APPEND_DATA": true,
+            "READ_EA": true,
+            "WRITE_EA": true,
+            "EXECUTE": false,
+            "READ_ATTRIBUTES": true,
+            "WRITE_ATTRIBUTES": true,
+            "DELETE_CHILD": false,
+            "DELETE": false,
+            "READ_CONTROL": true,
+            "WRITE_DAC": false,
+            "SYNCHRONIZE": true,
+            "ACCESS_SYSTEM_SECURITY": false,
+            "text": "RW"
+          },
+          "caching": {
+            "READ": true,
+            "WRITE": true,
+            "HANDLE": true,
+            "hex": "0x00000007",
+            "text": "RWH"
+          },
+          "oplock": {
+            "EXCLUSIVE": false,
+            "BATCH": true,
+            "LEVEL_II": false,
+            "LEASE": false,
+            "text": "BATCH"
+          },
+          "lease": {},
+          "connected_at": "2022-07-20T12:06:29+0000"
+        }
+      }
+    },
+    "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee/a/x": {
+      "service_path": "/mnt/96dd85fd-6c60-409c-bc1c-15f98eb358ee",
+      "filename": "a/x",
+      "fileid": {
+        "devid": -397762331,
+        "inode": 13631493,
+        "extid": 0
+      },
+      "num_pending_deletes": 0,
+      "opens": {
+        "101/65": {
+          "server_id": {
+            "pid": "101",
+            "task_id": "0",
+            "vnn": "4294967295",
+            "unique_id": "7364797719700910696"
+          },
+          "uid": 1000,
+          "share_file_id": "65",
+          "sharemode": {
+            "hex": "0x00000007",
+            "NONE": false,
+            "READ": true,
+            "WRITE": true,
+            "DELETE": true,
+            "text": "RWD"
+          },
+          "access_mask": {
+            "hex": "0x0012019f",
+            "READ_DATA": true,
+            "WRITE_DATA": true,
+            "APPEND_DATA": true,
+            "READ_EA": true,
+            "WRITE_EA": true,
+            "EXECUTE": false,
+            "READ_ATTRIBUTES": true,
+            "WRITE_ATTRIBUTES": true,
+            "DELETE_CHILD": false,
+            "DELETE": false,
+            "READ_CONTROL": true,
+            "WRITE_DAC": false,
+            "SYNCHRONIZE": true,
+            "ACCESS_SYSTEM_SECURITY": false,
+            "text": "RW"
+          },
+          "caching": {
+            "READ": true,
+            "WRITE": true,
+            "HANDLE": true,
+            "hex": "0x00000007",
+            "text": "RWH"
+          },
+          "oplock": {
+            "EXCLUSIVE": false,
+            "BATCH": true,
+            "LEVEL_II": false,
+            "LEASE": true,
+            "text": "BATCH"
+          },
+          "lease": {},
+          "connected_at": "2022-07-20T12:06:42+0000"
+        }
+      }
+    }
+  }
+}

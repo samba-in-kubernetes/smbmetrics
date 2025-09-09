@@ -1,0 +1,28 @@
+{
+  "timestamp": "2023-06-07T11:49:05.528375+0000",
+  "version": "4.17.8",
+  "smb_conf": "/etc/samba/smb.conf",
+  "tcons": {
+    "2295102631": {
+      "service": "share1",
+      "server_id": {
+        "pid": "355",
+        "task_id": "0",
+        "vnn": "4294967295",
+        "unique_id": "4904044827525949167"
+      },
+      "tcon_id": "2295102631",
+      "session_id": "2875824865",
+      "machine": "::1",
+      "connected_at": "2023-06-07T11:44:56.766022+00:00",
+      "encryption": {
+        "cipher": "-",
+        "degree": "none"
+      },
+      "signing": {
+        "cipher": "-",
+        "degree": "none"
+      }
+    }
+  }
+}

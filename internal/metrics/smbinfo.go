@@ -2,41 +2,56 @@
 
 package metrics
 
-import "strings"
+import (
+	"github.com/go-logr/logr"
+)
 
 // SMBInfo provides a bridge layer between raw smbstatus info and exported
 // metric counters. It also implements the more complex logic which requires in
 // memory re-mapping of the low-level information (e.g., stats by machine/user).
 type SMBInfo struct {
-	smbstat *SMBStatus
+	tconsStatus    *SMBStatus
+	sessionsStatus *SMBStatus
+	log            logr.Logger
 }
 
-func NewSMBInfo() *SMBInfo {
-	return &SMBInfo{smbstat: NewSMBStatus()}
+func NewSMBInfo(log logr.Logger) *SMBInfo {
+	return &SMBInfo{
+		tconsStatus:    NewSMBStatus(),
+		sessionsStatus: NewSMBStatus(),
+		log:            log,
+	}
 }
 
-func NewUpdatedSMBInfo() (*SMBInfo, error) {
-	smbinfo := NewSMBInfo()
+func NewUpdatedSMBInfo(log logr.Logger) (*SMBInfo, error) {
+	smbinfo := NewSMBInfo(log)
 	err := smbinfo.Update()
 	return smbinfo, err
 }
 
 func (smbinfo *SMBInfo) Update() error {
-	smbstat, err := RunSMBStatus()
+	tconsStatus, err := RunSMBStatusShares()
 	if err != nil {
+		smbinfo.log.Error(err, "smbsstatus --shares failed")
 		return err
 	}
-	smbinfo.smbstat = smbstat
+	sessionsStatus, err := RunSMBStatusProcesses()
+	if err != nil {
+		smbinfo.log.Error(err, "smbsstatus --processes failed")
+		return err
+	}
+	smbinfo.tconsStatus = tconsStatus
+	smbinfo.sessionsStatus = sessionsStatus
 	return nil
 }
 
 func (smbinfo *SMBInfo) TotalSessions() int {
-	return len(smbinfo.smbstat.Sessions)
+	return len(smbinfo.sessionsStatus.Sessions)
 }
 
 func (smbinfo *SMBInfo) TotalTreeCons() int {
 	total := 0
-	for _, tcon := range smbinfo.smbstat.TCons {
+	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
 			continue
@@ -46,25 +61,9 @@ func (smbinfo *SMBInfo) TotalTreeCons() int {
 	return total
 }
 
-func (smbinfo *SMBInfo) TotalOpenFiles() int {
-	return len(smbinfo.smbstat.OpenFiles)
-}
-
-func (smbinfo *SMBInfo) TotalOpenFilesAccessRW() int {
-	total := 0
-	for _, openf := range smbinfo.smbstat.OpenFiles {
-		for _, opens := range openf.Opens {
-			if strings.Contains(opens.AccessMask.Text, "RW") {
-				total++
-			}
-		}
-	}
-	return total
-}
-
 func (smbinfo *SMBInfo) TotalConnectedUsers() int {
 	users := map[string]bool{}
-	for _, session := range smbinfo.smbstat.Sessions {
+	for _, session := range smbinfo.sessionsStatus.Sessions {
 		username := session.Username
 		if len(username) > 0 {
 			users[username] = true
@@ -75,7 +74,7 @@ func (smbinfo *SMBInfo) TotalConnectedUsers() int {
 
 func (smbinfo *SMBInfo) MapMachineToSessions() map[string][]*SMBStatusSession {
 	ret := map[string][]*SMBStatusSession{}
-	for _, session := range smbinfo.smbstat.Sessions {
+	for _, session := range smbinfo.sessionsStatus.Sessions {
 		machineID := session.RemoteMachine
 		sessionRef := &session
 		ret[machineID] = append(ret[machineID], sessionRef)
@@ -85,7 +84,7 @@ func (smbinfo *SMBInfo) MapMachineToSessions() map[string][]*SMBStatusSession {
 
 func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
 	ret := map[string][]*SMBStatusTreeCon{}
-	for _, tcon := range smbinfo.smbstat.TCons {
+	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
 			continue
@@ -98,7 +97,7 @@ func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
 
 func (smbinfo *SMBInfo) MapMachineToTreeCons() map[string][]*SMBStatusTreeCon {
 	ret := map[string][]*SMBStatusTreeCon{}
-	for _, tcon := range smbinfo.smbstat.TCons {
+	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
 			continue
@@ -112,7 +111,7 @@ func (smbinfo *SMBInfo) MapMachineToTreeCons() map[string][]*SMBStatusTreeCon {
 
 func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
 	ret := map[string]map[string]int{}
-	for _, tcon := range smbinfo.smbstat.TCons {
+	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
 			continue
@@ -130,7 +129,7 @@ func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
 
 func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
 	ret := map[string]map[string]int{}
-	for _, tcon := range smbinfo.smbstat.TCons {
+	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
 			continue
@@ -148,4 +147,34 @@ func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
 
 func isInternalServiceID(serviceID string) bool {
 	return serviceID == "IPC$"
+}
+
+// SMBProfileInfo provides a bridge layer between raw smbstatus profile info and
+// exported metric counters.
+type SMBProfileInfo struct {
+	profileStatus *SMBProfile
+	log           logr.Logger
+}
+
+func NewSMBProfileInfo(log logr.Logger) *SMBProfileInfo {
+	return &SMBProfileInfo{
+		profileStatus: NewSMBProfile(),
+		log:           log,
+	}
+}
+
+func NewUpdatedSMBProfileInfo(log logr.Logger) (*SMBProfileInfo, error) {
+	smbProfileInfo := NewSMBProfileInfo(log)
+	err := smbProfileInfo.Update()
+	return smbProfileInfo, err
+}
+
+func (smbProfileInfo *SMBProfileInfo) Update() error {
+	profiuleStatus, err := RunSMBStatusProfile()
+	if err != nil {
+		smbProfileInfo.log.Error(err, "smbsstatus --profile failed")
+		return err
+	}
+	smbProfileInfo.profileStatus = profiuleStatus
+	return nil
 }

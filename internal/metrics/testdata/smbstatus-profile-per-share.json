@@ -1,0 +1,1628 @@
+{
+  "timestamp": "2025-05-21T13:37:43.334965+0300",
+  "version": "4.23.0pre1-GIT-7dc009e9727",
+  "smb_conf": "//etc/samba/smb.conf",
+  "SMBD loop": {
+    "connect": {
+      "count": 1
+    },
+    "disconnect": {
+      "count": 0
+    },
+    "idle": {
+      "count": 164,
+      "time": 365400653
+    },
+    "cpu_user": {
+      "time": 42116
+    },
+    "cpu_system": {
+      "time": 37867
+    },
+    "request": {
+      "count": 152
+    },
+    "push_sec_ctx": {
+      "count": 163,
+      "time": 1629
+    },
+    "set_sec_ctx": {
+      "count": 33,
+      "time": 2429
+    },
+    "set_root_sec_ctx": {
+      "count": 180,
+      "time": 3009
+    },
+    "pop_sec_ctx": {
+      "count": 163,
+      "time": 1718
+    },
+    "num_sessions": {
+      "count": 1
+    },
+    "num_tcons": {
+      "count": 3
+    },
+    "num_files": {
+      "count": 0
+    }
+  },
+  "Authentication": {
+    "authentication": {
+      "count": 1
+    },
+    "authentication_failed": {
+      "count": 0
+    }
+  },
+  "System Calls": {
+    "syscall_opendir": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_fdopendir": {
+      "count": 16,
+      "time": 150
+    },
+    "syscall_readdir": {
+      "count": 83,
+      "time": 282
+    },
+    "syscall_rewinddir": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_mkdirat": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_closedir": {
+      "count": 16,
+      "time": 106
+    },
+    "syscall_open": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_openat": {
+      "count": 154,
+      "time": 1577
+    },
+    "syscall_createfile": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_close": {
+      "count": 134,
+      "time": 652
+    },
+    "syscall_pread": {
+      "count": 0,
+      "time": 0,
+      "idle": 0,
+      "bytes": 0
+    },
+    "syscall_asys_pread": {
+      "count": 3,
+      "time": 586,
+      "idle": 553,
+      "bytes": 339
+    },
+    "syscall_pwrite": {
+      "count": 0,
+      "time": 0,
+      "idle": 0,
+      "bytes": 0
+    },
+    "syscall_asys_pwrite": {
+      "count": 2,
+      "time": 883,
+      "idle": 311,
+      "bytes": 226
+    },
+    "syscall_lseek": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_sendfile": {
+      "count": 0,
+      "time": 0,
+      "idle": 0,
+      "bytes": 0
+    },
+    "syscall_recvfile": {
+      "count": 0,
+      "time": 0,
+      "idle": 0,
+      "bytes": 0
+    },
+    "syscall_renameat": {
+      "count": 1,
+      "time": 16
+    },
+    "syscall_asys_fsync": {
+      "count": 1,
+      "time": 3644,
+      "idle": 165,
+      "bytes": 0
+    },
+    "syscall_stat": {
+      "count": 139,
+      "time": 789
+    },
+    "syscall_fstat": {
+      "count": 207,
+      "time": 728
+    },
+    "syscall_lstat": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_fstatat": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_get_alloc_size": {
+      "count": 97,
+      "time": 58
+    },
+    "syscall_unlinkat": {
+      "count": 1,
+      "time": 57
+    },
+    "syscall_chmod": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_fchmod": {
+      "count": 1,
+      "time": 13
+    },
+    "syscall_fchown": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_lchown": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_chdir": {
+      "count": 57,
+      "time": 546
+    },
+    "syscall_getwd": {
+      "count": 3,
+      "time": 18
+    },
+    "syscall_fntimes": {
+      "count": 2,
+      "time": 17
+    },
+    "syscall_ftruncate": {
+      "count": 1,
+      "time": 90
+    },
+    "syscall_fallocate": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_fcntl_lock": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_fcntl": {
+      "count": 14,
+      "time": 37
+    },
+    "syscall_linux_setlease": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_fcntl_getlock": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_readlinkat": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_symlinkat": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_linkat": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_mknodat": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_realpath": {
+      "count": 6,
+      "time": 53
+    },
+    "syscall_get_quota": {
+      "count": 12,
+      "time": 1885
+    },
+    "syscall_set_quota": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_get_sd": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_set_sd": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_brl_lock": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_brl_unlock": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_brl_cancel": {
+      "count": 0,
+      "time": 0
+    },
+    "syscall_asys_getxattrat": {
+      "count": 0,
+      "time": 0,
+      "idle": 0,
+      "bytes": 0
+    }
+  },
+  "ACL Calls": {
+    "get_nt_acl": {
+      "count": 0,
+      "time": 0
+    },
+    "get_nt_acl_at": {
+      "count": 0,
+      "time": 0
+    },
+    "fget_nt_acl": {
+      "count": 32,
+      "time": 10596
+    },
+    "fset_nt_acl": {
+      "count": 0,
+      "time": 0
+    }
+  },
+  "Stat Cache": {
+    "statcache_lookups": {
+      "count": 4
+    },
+    "statcache_misses": {
+      "count": 4
+    },
+    "statcache_hits": {
+      "count": 0
+    }
+  },
+  "SMB Calls": {
+    "SMBmkdir": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBrmdir": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBopen": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBcreate": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBclose": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBflush": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBunlink": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBmv": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBgetatr": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsetatr": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBread": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwrite": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBlock": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBunlock": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBctemp": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBmknew": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBcheckpath": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBexit": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBlseek": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBlockread": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwriteunlock": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBreadbraw": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBreadBmpx": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBreadBs": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwritebraw": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwriteBmpx": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwriteBs": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwritec": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsetattrE": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBgetattrE": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBlockingX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBtrans": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBtranss": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBioctl": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBioctls": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBcopy": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBmove": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBecho": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwriteclose": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBopenX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBreadX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBwriteX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBtrans2": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBtranss2": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBfindclose": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBfindnclose": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBtcon": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBtdis": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBnegprot": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsesssetupX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBulogoffX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBtconX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBdskattr": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsearch": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBffirst": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBfunique": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBfclose": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBnttrans": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBnttranss": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBntcreateX": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBntcancel": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBntrename": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsplopen": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsplwr": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsplclose": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsplretq": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsends": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsendb": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBfwdname": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBcancelf": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBgetmac": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsendstrt": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsendend": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBsendtxt": {
+      "count": 0,
+      "time": 0
+    },
+    "SMBinvalid": {
+      "count": 0,
+      "time": 0
+    }
+  },
+  "Trans2 Calls": {
+    "Trans2_open": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_findfirst": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_findnext": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_qfsinfo": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_setfsinfo": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_qpathinfo": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_setpathinfo": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_qfileinfo": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_setfileinfo": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_fsctl": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_ioctl": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_findnotifyfirst": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_findnotifynext": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_mkdir": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_session_setup": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_get_dfs_referral": {
+      "count": 0,
+      "time": 0
+    },
+    "Trans2_report_dfs_inconsistancy": {
+      "count": 0,
+      "time": 0
+    }
+  },
+  "NT Transact Calls": {
+    "NT_transact_create": {
+      "count": 0,
+      "time": 0
+    },
+    "NT_transact_ioctl": {
+      "count": 0,
+      "time": 0
+    },
+    "NT_transact_set_security_desc": {
+      "count": 0,
+      "time": 0
+    },
+    "NT_transact_notify_change": {
+      "count": 0,
+      "time": 0
+    },
+    "NT_transact_rename": {
+      "count": 0,
+      "time": 0
+    },
+    "NT_transact_query_security_desc": {
+      "count": 0,
+      "time": 0
+    },
+    "NT_transact_get_user_quota": {
+      "count": 0,
+      "time": 0
+    },
+    "NT_transact_set_user_quota": {
+      "count": 0,
+      "time": 0
+    }
+  },
+  "SMB2 Calls": {
+    "smb2_negprot": {
+      "count": 1,
+      "failed_count": 0,
+      "time": 3795849,
+      "idle": 0,
+      "inbytes": 240,
+      "outbytes": 296
+    },
+    "smb2_sesssetup": {
+      "count": 2,
+      "failed_count": 0,
+      "time": 3749,
+      "idle": 0,
+      "inbytes": 430,
+      "outbytes": 264
+    },
+    "smb2_logoff": {
+      "count": 0,
+      "failed_count": 0,
+      "time": 0,
+      "idle": 0,
+      "inbytes": 0,
+      "outbytes": 0
+    },
+    "smb2_tcon": {
+      "count": 3,
+      "failed_count": 0,
+      "time": 3601,
+      "idle": 0,
+      "inbytes": 368,
+      "outbytes": 240
+    },
+    "smb2_tdis": {
+      "count": 0,
+      "failed_count": 0,
+      "time": 0,
+      "idle": 0,
+      "inbytes": 0,
+      "outbytes": 0
+    },
+    "smb2_create": {
+      "count": 39,
+      "failed_count": 1,
+      "time": 28911,
+      "idle": 0,
+      "inbytes": 7512,
+      "outbytes": 9380
+    },
+    "smb2_close": {
+      "count": 38,
+      "failed_count": 0,
+      "time": 5474,
+      "idle": 0,
+      "inbytes": 3344,
+      "outbytes": 4740
+    },
+    "smb2_flush": {
+      "count": 1,
+      "failed_count": 0,
+      "time": 3658,
+      "idle": 0,
+      "inbytes": 88,
+      "outbytes": 68
+    },
+    "smb2_read": {
+      "count": 3,
+      "failed_count": 0,
+      "time": 666,
+      "idle": 0,
+      "inbytes": 339,
+      "outbytes": 579
+    },
+    "smb2_write": {
+      "count": 2,
+      "failed_count": 0,
+      "time": 1069,
+      "idle": 0,
+      "inbytes": 450,
+      "outbytes": 160
+    },
+    "smb2_lock": {
+      "count": 0,
+      "failed_count": 0,
+      "time": 0,
+      "idle": 0,
+      "inbytes": 0,
+      "outbytes": 0
+    },
+    "smb2_ioctl": {
+      "count": 5,
+      "failed_count": 2,
+      "time": 954,
+      "idle": 0,
+      "inbytes": 770,
+      "outbytes": 678
+    },
+    "smb2_cancel": {
+      "count": 0,
+      "failed_count": 0,
+      "time": 0,
+      "idle": 0,
+      "inbytes": 0,
+      "outbytes": 0
+    },
+    "smb2_keepalive": {
+      "count": 4,
+      "failed_count": 0,
+      "time": 18,
+      "idle": 0,
+      "inbytes": 272,
+      "outbytes": 272
+    },
+    "smb2_find": {
+      "count": 24,
+      "failed_count": 0,
+      "time": 4918,
+      "idle": 0,
+      "inbytes": 2352,
+      "outbytes": 5260
+    },
+    "smb2_notify": {
+      "count": 0,
+      "failed_count": 0,
+      "time": 0,
+      "idle": 0,
+      "inbytes": 0,
+      "outbytes": 0
+    },
+    "smb2_getinfo": {
+      "count": 25,
+      "failed_count": 0,
+      "time": 3080,
+      "idle": 0,
+      "inbytes": 2608,
+      "outbytes": 3376
+    },
+    "smb2_setinfo": {
+      "count": 3,
+      "failed_count": 0,
+      "time": 591,
+      "idle": 0,
+      "inbytes": 368,
+      "outbytes": 204
+    },
+    "smb2_break": {
+      "count": 0,
+      "failed_count": 0,
+      "time": 0,
+      "idle": 0,
+      "inbytes": 0,
+      "outbytes": 0
+    }
+  },
+  "Extended Profile": {
+    "smbshare1:10949.0[192.168.122.108]": {
+      "System Calls": {
+        "syscall_opendir": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fdopendir": {
+          "count": 9,
+          "time": 82
+        },
+        "syscall_readdir": {
+          "count": 48,
+          "time": 120
+        },
+        "syscall_rewinddir": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_mkdirat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_closedir": {
+          "count": 9,
+          "time": 50
+        },
+        "syscall_open": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_openat": {
+          "count": 84,
+          "time": 778
+        },
+        "syscall_createfile": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_close": {
+          "count": 72,
+          "time": 345
+        },
+        "syscall_pread": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_asys_pread": {
+          "count": 3,
+          "time": 586,
+          "idle": 551,
+          "bytes": 339
+        },
+        "syscall_pwrite": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_asys_pwrite": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_lseek": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_sendfile": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_recvfile": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_renameat": {
+          "count": 1,
+          "time": 16
+        },
+        "syscall_asys_fsync": {
+          "count": 1,
+          "time": 3637,
+          "idle": 159,
+          "bytes": 0
+        },
+        "syscall_stat": {
+          "count": 73,
+          "time": 404
+        },
+        "syscall_fstat": {
+          "count": 111,
+          "time": 367
+        },
+        "syscall_lstat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fstatat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_get_alloc_size": {
+          "count": 52,
+          "time": 21
+        },
+        "syscall_unlinkat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_chmod": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fchmod": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fchown": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_lchown": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_chdir": {
+          "count": 30,
+          "time": 312
+        },
+        "syscall_getwd": {
+          "count": 1,
+          "time": 7
+        },
+        "syscall_fntimes": {
+          "count": 2,
+          "time": 17
+        },
+        "syscall_ftruncate": {
+          "count": 1,
+          "time": 91
+        },
+        "syscall_fallocate": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fcntl_lock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fcntl": {
+          "count": 8,
+          "time": 18
+        },
+        "syscall_linux_setlease": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fcntl_getlock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_readlinkat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_symlinkat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_linkat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_mknodat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_realpath": {
+          "count": 2,
+          "time": 9
+        },
+        "syscall_get_quota": {
+          "count": 6,
+          "time": 1142
+        },
+        "syscall_set_quota": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_get_sd": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_set_sd": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_brl_lock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_brl_unlock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_brl_cancel": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_asys_getxattrat": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        }
+      },
+      "SMB2 Calls": {
+        "smb2_negprot": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_sesssetup": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_logoff": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_tcon": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_tdis": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_create": {
+          "count": 21,
+          "failed_count": 1,
+          "time": 16860,
+          "idle": 0,
+          "inbytes": 4056,
+          "outbytes": 4992
+        },
+        "smb2_close": {
+          "count": 20,
+          "failed_count": 0,
+          "time": 2890,
+          "idle": 0,
+          "inbytes": 1760,
+          "outbytes": 2496
+        },
+        "smb2_flush": {
+          "count": 1,
+          "failed_count": 0,
+          "time": 3659,
+          "idle": 0,
+          "inbytes": 88,
+          "outbytes": 68
+        },
+        "smb2_read": {
+          "count": 3,
+          "failed_count": 0,
+          "time": 666,
+          "idle": 0,
+          "inbytes": 339,
+          "outbytes": 579
+        },
+        "smb2_write": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_lock": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_ioctl": {
+          "count": 1,
+          "failed_count": 0,
+          "time": 667,
+          "idle": 0,
+          "inbytes": 176,
+          "outbytes": 124
+        },
+        "smb2_cancel": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_keepalive": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_find": {
+          "count": 12,
+          "failed_count": 0,
+          "time": 2903,
+          "idle": 0,
+          "inbytes": 1176,
+          "outbytes": 2718
+        },
+        "smb2_notify": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_getinfo": {
+          "count": 13,
+          "failed_count": 0,
+          "time": 1807,
+          "idle": 0,
+          "inbytes": 1356,
+          "outbytes": 1780
+        },
+        "smb2_setinfo": {
+          "count": 3,
+          "failed_count": 0,
+          "time": 591,
+          "idle": 0,
+          "inbytes": 368,
+          "outbytes": 204
+        },
+        "smb2_break": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        }
+      }
+    },
+    "smbshare2:10949.1[192.168.122.108]": {
+      "System Calls": {
+        "syscall_opendir": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fdopendir": {
+          "count": 7,
+          "time": 67
+        },
+        "syscall_readdir": {
+          "count": 35,
+          "time": 157
+        },
+        "syscall_rewinddir": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_mkdirat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_closedir": {
+          "count": 7,
+          "time": 52
+        },
+        "syscall_open": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_openat": {
+          "count": 70,
+          "time": 759
+        },
+        "syscall_createfile": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_close": {
+          "count": 62,
+          "time": 285
+        },
+        "syscall_pread": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_asys_pread": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_pwrite": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_asys_pwrite": {
+          "count": 2,
+          "time": 884,
+          "idle": 312,
+          "bytes": 226
+        },
+        "syscall_lseek": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_sendfile": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_recvfile": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_renameat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_asys_fsync": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        },
+        "syscall_stat": {
+          "count": 62,
+          "time": 350
+        },
+        "syscall_fstat": {
+          "count": 96,
+          "time": 342
+        },
+        "syscall_lstat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fstatat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_get_alloc_size": {
+          "count": 45,
+          "time": 12
+        },
+        "syscall_unlinkat": {
+          "count": 1,
+          "time": 57
+        },
+        "syscall_chmod": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fchmod": {
+          "count": 1,
+          "time": 12
+        },
+        "syscall_fchown": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_lchown": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_chdir": {
+          "count": 25,
+          "time": 191
+        },
+        "syscall_getwd": {
+          "count": 1,
+          "time": 4
+        },
+        "syscall_fntimes": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_ftruncate": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fallocate": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fcntl_lock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fcntl": {
+          "count": 6,
+          "time": 16
+        },
+        "syscall_linux_setlease": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_fcntl_getlock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_readlinkat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_symlinkat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_linkat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_mknodat": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_realpath": {
+          "count": 2,
+          "time": 36
+        },
+        "syscall_get_quota": {
+          "count": 6,
+          "time": 740
+        },
+        "syscall_set_quota": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_get_sd": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_set_sd": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_brl_lock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_brl_unlock": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_brl_cancel": {
+          "count": 0,
+          "time": 0
+        },
+        "syscall_asys_getxattrat": {
+          "count": 0,
+          "time": 0,
+          "idle": 0,
+          "bytes": 0
+        }
+      },
+      "SMB2 Calls": {
+        "smb2_negprot": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_sesssetup": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_logoff": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_tcon": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_tdis": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_create": {
+          "count": 18,
+          "failed_count": 0,
+          "time": 12046,
+          "idle": 0,
+          "inbytes": 3456,
+          "outbytes": 4388
+        },
+        "smb2_close": {
+          "count": 18,
+          "failed_count": 0,
+          "time": 2568,
+          "idle": 0,
+          "inbytes": 1584,
+          "outbytes": 2244
+        },
+        "smb2_flush": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_read": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_write": {
+          "count": 2,
+          "failed_count": 0,
+          "time": 1071,
+          "idle": 0,
+          "inbytes": 450,
+          "outbytes": 160
+        },
+        "smb2_lock": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_ioctl": {
+          "count": 1,
+          "failed_count": 0,
+          "time": 35,
+          "idle": 0,
+          "inbytes": 121,
+          "outbytes": 144
+        },
+        "smb2_cancel": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_keepalive": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_find": {
+          "count": 12,
+          "failed_count": 0,
+          "time": 2015,
+          "idle": 0,
+          "inbytes": 1176,
+          "outbytes": 2542
+        },
+        "smb2_notify": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_getinfo": {
+          "count": 12,
+          "failed_count": 0,
+          "time": 1273,
+          "idle": 0,
+          "inbytes": 1252,
+          "outbytes": 1596
+        },
+        "smb2_setinfo": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        },
+        "smb2_break": {
+          "count": 0,
+          "failed_count": 0,
+          "time": 0,
+          "idle": 0,
+          "inbytes": 0,
+          "outbytes": 0
+        }
+      }
+    }
+  }
+}

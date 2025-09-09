@@ -3,6 +3,7 @@
 package main
 
 import (
+	"net"
 	"os"
 	goruntime "runtime"
 
@@ -27,6 +28,12 @@ func main() {
 	var port int
 	pflag.IntVar(&port, "port", metrics.DefaultMetricsPort,
 		"Prometheus metrics-exporter port number")
+	var bindAddress net.IP
+	pflag.IPVar(&bindAddress, "address", bindAddress,
+		"Prometheus metrics-exporter bind address")
+	var noProfile bool
+	pflag.BoolVar(&noProfile, "no-profile", false,
+		"Run without collecting profile information")
 	pflag.Parse()
 
 	log := zap.New(zap.UseDevMode(true))
@@ -54,7 +61,12 @@ func main() {
 	}
 	log.Info("Located smbstatus", "path", loc, "version", ver)
 
-	err = metrics.RunSmbMetricsExporter(log, port)
+	var bindAddrs []net.IP
+	if len(bindAddress) > 0 {
+		bindAddrs = append(bindAddrs, bindAddress)
+		log.Info("User supplied bind addresses", "bindAddrs", bindAddrs)
+	}
+	err = metrics.RunSmbMetricsExporter(log, port, bindAddrs, !noProfile)
 	if err != nil {
 		os.Exit(1)
 	}

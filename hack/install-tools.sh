@@ -42,19 +42,19 @@ _install_controller_gen() {
 }
 
 _install_revive() {
-	_install_tool github.com/mgechev/revive@v1.3.7
+	_install_tool github.com/mgechev/revive@v1.9.0
 }
 
 _install_golangci_lint() {
-	_install_tool github.com/golangci/golangci-lint/cmd/golangci-lint@v1.57.2
+	_install_tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.1.6
 }
 
 _install_yq() {
-	_install_tool github.com/mikefarah/yq/v4@v4.23.1
+	_install_tool github.com/mikefarah/yq/v4@v4.45.4
 }
 
 _install_gosec() {
-	_install_tool github.com/securego/gosec/v2/cmd/gosec@v2.19.0
+	_install_tool github.com/securego/gosec/v2/cmd/gosec@v2.20.0
 }
 
 _install_gitlint() {

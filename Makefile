@@ -14,8 +14,12 @@ BUILDAH_CMD:=buildah
 YAMLLINT_CMD:=yamllint
 
 # Image URL to use all building/pushing image targets
-TAG?=latest
-IMG?=quay.io/samba.org/samba-metrics:$(TAG)
+BASE_IMG_TAG?=latest
+BASE_IMG_URL?=quay.io/samba.org/samba-server
+BASE_IMG?=$(BASE_IMG_URL):$(BASE_IMG_TAG)
+IMG_TAG?=$(BASE_IMG_TAG)
+IMG_URL?=quay.io/samba.org/samba-metrics
+IMG?=$(IMG_URL):$(IMG_TAG)
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell $(GO_CMD) env GOBIN))
@@ -94,6 +98,7 @@ image-build: Dockerfile
 		--build-arg=GIT_VERSION="$(GIT_VERSION)" \
 		--build-arg=COMMIT_ID="$(COMMIT_ID)" \
 		--build-arg=ARCH="$(GOARCH)" \
+		--build-arg=BASE_IMG="$(BASE_IMG)" \
 		$(CONTAINER_BUILD_OPTS) -f $< -t $(IMG) .
 
 # Push the container image
