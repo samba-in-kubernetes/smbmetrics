@@ -25,18 +25,17 @@ git merge main
 ```
 
 Now we need to "pin" the appropriate version of the samba-server container
-dependency.  Edit `Dockerfile` and change the tag part of the "FROM" line with
-the `quay.io/samba.org/samba-server` image repository to use the latest
-released samba-server tag.
+dependency. Ensure that you use the proper base samba-server image (default:
+`quay.io/samba.org/samba-server`) and latest released samba-server tag.
 
 At this point, an optional but recommended step is to do a test build before
-tagging.  Run `make image-build`.
+tagging.  Run `make BASE_IMG_TAG=v0.7 image-build`.
 
 If you are happy with the content of the `release` branch, tag it. Example:
 
 ```
 git checkout release
-git tag -a -m 'Release v0.5' v0.5
+git tag -a -m 'Release v0.7' v0.7
 ```
 
 This creates an annotated tag. Release tags must be annotated tags.
@@ -53,18 +52,19 @@ is recommended to purge your local container engine of cached images
 
 Build the images from scratch. Example:
 ```
-make image-build
+make BASE_IMG_TAG=v0.7 image-build
 ```
 
 For the image that was just built, apply a temporary pre-release tag
 to it. Example:
 ```
-podman tag quay.io/samba.org/samba-metrics:{latest,v0.5pre1}
+export IMG_TAG=v0.7
+podman tag quay.io/samba.org/samba-metrics:{${IMG_TAG},${IMG_TAG}pre1}
 ```
 
 Log into quay.io.  Push the images to quay.io using the temporary tag. Example:
 ```
-podman push quay.io/samba.org/samba-metrics:{latest,v0.5pre1}
+podman push quay.io/samba.org/samba-metrics:{${IMG_TAG},${IMG_TAG}pre1}
 ```
 
 Wait for the security scan to complete. There shouldn't be any issues if you
@@ -100,8 +100,8 @@ Use the following partial snippet as an example:
 
 Images built for this release can be obtained from the quay.io image registry.
 
-* By tag: quay.io/samba.org/samba-metrics:v0.5
-* By digest: quay.io/samba.org/samba-metrics@sha256:09c867343af39b237230f94a734eacc8313f2330c7d934994522ced46b740715
+* By tag: quay.io/samba.org/samba-metrics:v0.7
+* By digest: quay.io/samba.org/samba-metrics@sha256:aaaa17c124ca310177abc00bcb9c3a0cf20e52c8728afee13cd66eb7e472b164
 ```
 ... using the image that was pushed earlier
 

@@ -1,11 +1,10 @@
-# Args
 ARG BASE_IMG="quay.io/samba.org/samba-server:latest"
+
+# Build smbmetrics
+FROM docker.io/golang:1.25 AS builder
 ARG GIT_VERSION="(unset)"
 ARG COMMIT_ID="(unset)"
 ARG ARCH=""
-
-# Build smbmetrics
-FROM docker.io/golang:1.24 AS builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
