@@ -5,6 +5,7 @@ package metrics
 import (
 	"context"
 	"errors"
+	"strings"
 )
 
 var (
@@ -35,8 +36,10 @@ func ResolveVersions(clnt *kclient) (Versions, error) {
 	if clnt != nil {
 		vers.SambaImage, imgErr = resolveSambaImage(clnt)
 	}
-	vers.SambaVersion, smbVersErr = resolveSambaVersion()
-	vers.CtdbVersion, ctdbVersErr = resolveCtdbVersion()
+	sambaVersion, smbVersErr := resolveSambaVersion()
+	vers.SambaVersion = strings.TrimSpace(sambaVersion)
+	ctdbVersion, ctdbVersErr := resolveCtdbVersion()
+	vers.CtdbVersion = strings.TrimSpace(ctdbVersion)
 	return vers, errors.Join(imgErr, smbVersErr, ctdbVersErr)
 }
 
