@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"net"
 	"os"
 	goruntime "runtime"
@@ -34,7 +35,14 @@ func main() {
 	var noProfile bool
 	pflag.BoolVar(&noProfile, "no-profile", false,
 		"Run without collecting profile information")
+	var showVersions bool
+	pflag.BoolVar(&showVersions, "show-versions", false,
+		"Show versions info and exit")
 	pflag.Parse()
+
+	if showVersions {
+		showVersionsAndExit()
+	}
 
 	log := zap.New(zap.UseDevMode(true))
 	log.Info("Initializing smbmetrics",
@@ -70,4 +78,15 @@ func main() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+func showVersionsAndExit() {
+	vers, _ := metrics.ResolveVersions(nil)
+	fmt.Println("Progname:", os.Args[0])
+	fmt.Println("Version:", vers.Version)
+	fmt.Println("CommitID:", vers.CommitID)
+	fmt.Println("GoVersion:", goruntime.Version())
+	fmt.Println("Arch:", goruntime.GOARCH)
+	fmt.Println("SambaVersion:", vers.SambaVersion)
+	os.Exit(0)
 }
