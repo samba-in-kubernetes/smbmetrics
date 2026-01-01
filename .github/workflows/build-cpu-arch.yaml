@@ -1,0 +1,26 @@
+---
+name: "Build on various CPU architectures"
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  build-and-test:
+    strategy:
+      matrix:
+        arch:
+          - {name: amd64, host: ubuntu-24.04}
+          - {name: arm64, host: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.arch.host }}
+    steps:
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00
+        with:
+          go-version: "stable"
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - name: Build
+        run: make
+      - name: Test
+        run: make test
+      - name: Info
+        run: ./bin/smbmetrics --show-versions
