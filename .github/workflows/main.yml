@@ -8,7 +8,6 @@ on:
   # Allow manually triggering a run in the github ui.
   # See: https://docs.github.com/en/actions/using-workflows/manually-running-a-workflow
   workflow_dispatch: {}
-
 jobs:
   # Do a build/compile smoke test
   build:
@@ -90,7 +89,7 @@ jobs:
           [containers]
           netns = "host"
           EOF
-      - name: build container image
+      - name: Build container image
         # note: forcing use of podman here since we are
         # using podman explicitly for the push job
         run: make CONTAINER_CMD=podman image-build
@@ -101,36 +100,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-      - name: build container image
+      - name: Build container image
         # note: forcing use of podman here since we are
         # using podman explicitly for the push job
         run: make CONTAINER_CMD=docker image-build
-  # push the container to quay.io - only for pushes, not PRs
-  push:
-    needs: [build, check, test]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
-      - name: log in to quay.io
-        # using docker for now, since podman has an issue with space
-        # consumption: image build fails with no space left on device...
-        run: echo "${{ secrets.QUAY_PASS }}" | docker login -u "${{ secrets.QUAY_USER }}" --password-stdin quay.io
-      - name: build container image
-        # note: forcing use of docker here, since we did docker login above
-        run: make CONTAINER_CMD=docker image-build
-      - name: push container image
-        # note: forcing use of docker here, since we did docker login above
-        run: make CONTAINER_CMD=docker image-push
-      - name: build dev container image
-        # note: forcing use of docker here, since we did docker login above
-        run: make CONTAINER_CMD=docker BASE_IMG_TAG=devbuilds-centos-amd64 image-build
-      - name: push dev container image
-        # note: forcing use of docker here, since we did docker login above
-        run: make CONTAINER_CMD=docker BASE_IMG_TAG=devbuilds-centos-amd64 image-push
-      - name: build ceph20 container image
-        # note: forcing use of docker here, since we did docker login above
-        run: make CONTAINER_CMD=docker BASE_IMG_TAG=ceph20-centos-amd64 image-build
-      - name: push ceph20 container image
-        # note: forcing use of docker here, since we did docker login above
-        run: make CONTAINER_CMD=docker BASE_IMG_TAG=ceph20-centos-amd64 image-push
