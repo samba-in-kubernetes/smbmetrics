@@ -1,0 +1,169 @@
+name: Images
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+env:
+  BUILDAH_FORMAT: oci
+  IMG_URL: quay.io/samba.org/samba-metrics
+jobs:
+  build-image-per-cpu-arch:
+    strategy:
+      matrix:
+        package_source: [default, nightly, devbuilds, ceph20]
+        os: [centos]
+        arch:
+          - {name: amd64, host: ubuntu-24.04}
+          - {name: arm64, host: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.arch.host }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    env:
+      BASE_IMG_TAG: ${{ matrix.package_source }}-${{ matrix.os }}-${{ matrix.arch.name }}
+      IMG_TAG: ${{ matrix.package_source }}-${{ matrix.os }}-${{ matrix.arch.name }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      - name: Check podman (debug)
+        run: podman --version
+      - name: Build image ${{ env.IMG_TAG }}
+        run: >
+          make CONTAINER_CMD=podman \
+            BASE_IMG_TAG=${{ env.BASE_IMG_TAG }} \
+            IMG_URL=${{ env.IMG_URL }} \
+            IMG_TAG=${{ env.IMG_TAG }} \
+            image-build
+      - name: Save image ${{ env.IMG_TAG }}
+        run: >
+          podman save -o samba_metrics_${{ env.IMG_TAG }} \
+            ${{ env.IMG_URL }}:${{ env.IMG_TAG }}
+      - name: Upload image
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: action_image_artifact_samba_metrics_${{ env.IMG_TAG }}
+          path: samba_metrics_${{ env.IMG_TAG }}
+          retention-days: 1
+  multiarch-images:
+    strategy:
+      matrix:
+        package_source: [default, nightly, devbuilds, ceph20]
+        os: [centos]
+    needs: build-image-per-cpu-arch
+    runs-on: ubuntu-latest
+    env:
+      IMG_TAG_PREFIX: ${{ matrix.package_source }}-${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+      - name: Cache podman storage
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb
+        with:
+          path: |
+            ~/.local/share/containers
+            ~/.config/containers
+          key: ${{ runner.os }}-podman-${{ hashFiles('Containerfile', '**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-podman-
+      - name: Download images
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          pattern: "action_image_artifact_samba_metrics_*"
+          path: image_files
+      - name: Load all images
+        run: |
+          for img in $(find image_files -type f) ; do
+            podman image load -i "$img"
+          done
+      - name: List images (debug)
+        run: podman images
+      - name: Clear tmp images
+        run: |
+          for img in $(find image_files -type f) ; do
+            rm -f "$img"
+          done
+      - name: Create multi-arch image
+        run: >
+          podman manifest create \
+            ${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-any \
+      - name: Add AMD64 image
+        run: >
+          podman manifest add \
+            ${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-any \
+            containers-storage:${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-amd64
+      - name: Add ARM64 image
+        run: >
+          podman manifest add \
+            ${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-any \
+            containers-storage:${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-arm64
+      - name: List all images (debug)
+        run: podman images
+      - name: Login to quay.io
+        run: >
+          echo "${{ secrets.QUAY_PASS }}" | \
+            podman login -u "${{ secrets.QUAY_USER }}" \
+              --password-stdin quay.io
+      - name: Push images
+        run: |
+          podman push ${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-amd64
+          podman push ${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-arm64
+      - name: Push multi-arch images
+        run: >
+          podman manifest push --all \
+            ${{ env.IMG_URL }}:${{ env.IMG_TAG_PREFIX }}-any
+      - name: Logout from quay.io
+        run: podman logout quay.io
+      - name: Remove local images
+        run: podman rmi --all
+  latest-image:
+    needs: multiarch-images
+    runs-on: ubuntu-latest
+    env:
+      IMG_TAG: latest
+    steps:
+      - name: Login to quay.io
+        run: >
+          echo "${{ secrets.QUAY_PASS }}" | \
+            podman login -u "${{ secrets.QUAY_USER }}" \
+              --password-stdin quay.io
+      - name: Create 'latest' image as multi-arch
+        run: |
+          podman manifest create ${{ env.IMG_URL }}:${{ env.IMG_TAG }}
+          podman manifest add --all ${{ env.IMG_URL }}:${{ env.IMG_TAG }} \
+            ${{ env.IMG_URL }}:default-centos-any
+      - name: Push 'latest' image
+        run: >
+          podman manifest push --all ${{ env.IMG_URL }}:${{ env.IMG_TAG }}
+      - name: Logout from quay.io
+        run: podman logout quay.io
+      - name: Remove local images
+        run: podman rmi --all
+  verify-image:
+    needs: latest-image
+    strategy:
+      matrix:
+        package_source: [default, nightly, devbuilds, ceph20]
+        arch:
+          - {name: amd64, host: ubuntu-24.04}
+          - {name: arm64, host: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.arch.host }}
+    env:
+      IMG_TAG: latest
+    steps:
+      - name: Login to quay.io
+        run: >
+          echo "${{ secrets.QUAY_PASS }}" | \
+            podman login -u "${{ secrets.QUAY_USER }}" \
+              --password-stdin quay.io
+      - name: Pull image
+        run: >
+          podman pull ${{ env.IMG_URL }}:${{ env.IMG_TAG }}
+      - name: Logout from quay.io
+        run: podman logout quay.io
+      - name: Run image
+        run: >
+          podman run ${{ env.IMG_URL }}:${{ env.IMG_TAG }} --show-versions
+      - name: Cleanup
+        run: >
+          podman system prune --all --force --volumes
