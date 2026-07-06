@@ -276,9 +276,11 @@ type SMBProfile struct {
 
 // LocateSMBStatus finds the local executable of 'smbstatus' on host.
 func LocateSMBStatus() (string, error) {
-	knowns := []string{
-		"/usr/bin/smbstatus",
+	knowns := []string{}
+	if loc, err := exec.LookPath("smbstatus"); err == nil {
+		knowns = append(knowns, loc)
 	}
+	knowns = append(knowns, "/usr/bin/smbstatus")
 	for _, loc := range knowns {
 		fi, err := os.Stat(loc)
 		if err != nil {
