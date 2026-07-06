@@ -61,13 +61,17 @@ func TestParseSMBStatusAll(t *testing.T) {
 
 func TestParseSMBStatusLocks(t *testing.T) {
 	testdata := readTestData(t, "smbstatus-locks.json")
-	locks, err := parseSMBStatusLockedFiles(testdata)
+	res, err := parseSMBStatusLocks(testdata)
 	assert.NoError(t, err)
-	assert.Equal(t, len(locks), 2)
-	lock1 := locks[0]
+	assert.Equal(t, len(res.OpenFiles), 2)
+
+	lock1, ok := res.OpenFiles["/A/A2/A6/r1"]
+	assert.True(t, ok)
 	assert.Equal(t, lock1.FileID.Inode, int64(61))
 	assert.Equal(t, lock1.NumPendingDeletes, 0)
-	lock2 := locks[1]
+
+	lock2, ok := res.OpenFiles["/A/A1/r2"]
+	assert.True(t, ok)
 	assert.Equal(t, lock2.FileID.Inode, int64(52))
 	assert.Equal(t, lock2.NumPendingDeletes, 2)
 }
