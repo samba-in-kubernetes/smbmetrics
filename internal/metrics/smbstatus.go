@@ -334,11 +334,11 @@ func RunSMBStatusLocks() ([]SMBStatusOpenFile, error) {
 }
 
 func parseSMBStatusLockedFiles(dat string) ([]SMBStatusOpenFile, error) {
-	lockedFiles := []SMBStatusOpenFile{}
 	res, err := parseSMBStatusLocks(dat)
 	if err != nil {
-		return lockedFiles, err
+		return []SMBStatusOpenFile{}, err
 	}
+	lockedFiles := make([]SMBStatusOpenFile, 0, len(res.OpenFiles))
 	for _, lfile := range res.OpenFiles {
 		lockedFiles = append(lockedFiles, lfile)
 	}
@@ -438,7 +438,7 @@ func NewSMBProfile() *SMBProfile {
 
 // ListSessions returns a slice for mapped sessions
 func (smbstat *SMBStatus) ListSessions() []SMBStatusSession {
-	sessions := []SMBStatusSession{}
+	sessions := make([]SMBStatusSession, 0, len(smbstat.Sessions))
 	for _, session := range smbstat.Sessions {
 		sessions = append(sessions, session)
 	}
@@ -447,7 +447,7 @@ func (smbstat *SMBStatus) ListSessions() []SMBStatusSession {
 
 // ListTreeCons returns a slice for mapped tree-connection
 func (smbstat *SMBStatus) ListTreeCons() []SMBStatusTreeCon {
-	tcons := []SMBStatusTreeCon{}
+	tcons := make([]SMBStatusTreeCon, 0, len(smbstat.TCons))
 	for _, share := range smbstat.TCons {
 		tcons = append(tcons, share)
 	}
