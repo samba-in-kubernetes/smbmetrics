@@ -62,7 +62,7 @@ func (smbinfo *SMBInfo) TotalTreeCons() int {
 }
 
 func (smbinfo *SMBInfo) TotalConnectedUsers() int {
-	users := map[string]bool{}
+	users := make(map[string]bool, len(smbinfo.sessionsStatus.Sessions))
 	for _, session := range smbinfo.sessionsStatus.Sessions {
 		username := session.Username
 		if len(username) > 0 {
@@ -73,7 +73,7 @@ func (smbinfo *SMBInfo) TotalConnectedUsers() int {
 }
 
 func (smbinfo *SMBInfo) MapMachineToSessions() map[string][]*SMBStatusSession {
-	ret := map[string][]*SMBStatusSession{}
+	ret := make(map[string][]*SMBStatusSession, len(smbinfo.sessionsStatus.Sessions))
 	for _, session := range smbinfo.sessionsStatus.Sessions {
 		machineID := session.RemoteMachine
 		sessionRef := &session
@@ -83,7 +83,7 @@ func (smbinfo *SMBInfo) MapMachineToSessions() map[string][]*SMBStatusSession {
 }
 
 func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
-	ret := map[string][]*SMBStatusTreeCon{}
+	ret := make(map[string][]*SMBStatusTreeCon, len(smbinfo.tconsStatus.TCons))
 	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
@@ -96,7 +96,7 @@ func (smbinfo *SMBInfo) MapServiceToTreeCons() map[string][]*SMBStatusTreeCon {
 }
 
 func (smbinfo *SMBInfo) MapMachineToTreeCons() map[string][]*SMBStatusTreeCon {
-	ret := map[string][]*SMBStatusTreeCon{}
+	ret := make(map[string][]*SMBStatusTreeCon, len(smbinfo.tconsStatus.TCons))
 	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
@@ -110,7 +110,7 @@ func (smbinfo *SMBInfo) MapMachineToTreeCons() map[string][]*SMBStatusTreeCon {
 }
 
 func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
-	ret := map[string]map[string]int{}
+	ret := make(map[string]map[string]int, len(smbinfo.tconsStatus.TCons))
 	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
@@ -128,7 +128,7 @@ func (smbinfo *SMBInfo) MapServiceToMachines() map[string]map[string]int {
 }
 
 func (smbinfo *SMBInfo) MapMachineToServies() map[string]map[string]int {
-	ret := map[string]map[string]int{}
+	ret := make(map[string]map[string]int, len(smbinfo.tconsStatus.TCons))
 	for _, tcon := range smbinfo.tconsStatus.TCons {
 		serviceID := tcon.Service
 		if isInternalServiceID(serviceID) {
