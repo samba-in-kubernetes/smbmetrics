@@ -15,7 +15,7 @@ jobs:
   build-image-per-cpu-arch:
     strategy:
       matrix:
-        package_source: [default, nightly, devbuilds, ceph20]
+        package_source: [default, nightly, devbuilds, ceph20, ceph21]
         os: [centos]
         arch:
           - {name: amd64, host: ubuntu-24.04}
@@ -49,7 +49,7 @@ jobs:
   multiarch-images:
     strategy:
       matrix:
-        package_source: [default, nightly, devbuilds, ceph20]
+        package_source: [default, nightly, devbuilds, ceph20, ceph21]
         os: [centos]
     needs: build-image-per-cpu-arch
     runs-on: ubuntu-latest
@@ -143,7 +143,7 @@ jobs:
     needs: latest-image
     strategy:
       matrix:
-        package_source: [default, nightly, devbuilds, ceph20]
+        package_source: [default, nightly, devbuilds, ceph20, ceph21]
         arch:
           - {name: amd64, host: ubuntu-24.04}
           - {name: arm64, host: ubuntu-24.04-arm}
